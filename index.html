@@ -6,178 +6,106 @@
 <title>동국대 체교과 실기 기록</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-:root{
-  --red:#D4341A;--orange:#E8621A;--yellow:#F5A623;--dark:#C44B0F;
-  --text:#1a1a1a;--subtext:#888;--bg:#f7f3f0;--white:#fff;
-  --shadow:0 4px 24px rgba(0,0,0,0.08);
-  --c1:#C44B0F;--c2:#D4341A;--c3:#E8621A;--c4:#F5A623;
-}
-html{background:#e8e0d8;}
-body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:var(--bg);min-height:100vh;max-width:480px;margin:0 auto;box-shadow:0 0 60px rgba(0,0,0,0.10);}
+:root{--red:#c0392b;--orange:#e67e22;--dark:#1a1a2e;--card:#fff;--bg:#f0f2f5;--text:#2c3e50;--sub:#7f8c8d;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Apple SD Gothic Neo',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 
-/* ── HEADER ── */
-.header{background:linear-gradient(135deg,var(--dark) 0%,var(--red) 50%,var(--orange) 100%);padding:28px 24px;position:relative;overflow:hidden;}
+/* HEADER */
+.header{background:linear-gradient(135deg,var(--dark) 0%,var(--red) 50%,var(--orange) 100%);padding:28px 20px;position:relative;overflow:hidden;}
 .header::before{content:'';position:absolute;width:200px;height:200px;background:rgba(255,255,255,0.05);border-radius:50%;top:-60px;right:-40px;pointer-events:none;}
 .header::after{content:'';position:absolute;width:140px;height:140px;background:rgba(255,255,255,0.05);border-radius:50%;bottom:-40px;left:-20px;pointer-events:none;}
 .header-inner{display:flex;align-items:center;gap:20px;position:relative;z-index:1;}
-.header-logo-box{flex-shrink:0;background:#fff;border-radius:18px;padding:14px 18px;box-shadow:0 6px 24px rgba(0,0,0,0.20);display:flex;align-items:center;justify-content:center;width:100px;height:100px;}
-.header-logo-box img{width:100%;height:100%;display:block;object-fit:contain;}
-.header-logo-text{font-size:13px;font-weight:900;color:var(--red);letter-spacing:0.5px;white-space:nowrap;text-align:center;}
+.header-logo-box{flex-shrink:0;background:#fff;border-radius:18px;padding:10px 14px;box-shadow:0 6px 24px rgba(0,0,0,0.20);display:flex;align-items:center;justify-content:center;width:100px;height:100px;}
+.header-logo-box img{width:100%;height:100%;object-fit:contain;}
+.header-logo-text{font-size:13px;font-weight:900;color:var(--red);text-align:center;}
 .header-info-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;}
-.header-univ{color:rgba(255,255,255,0.80);font-size:12px;letter-spacing:0.3px;}
-.header-name{color:#fff;font-size:32px;font-weight:900;letter-spacing:-1px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.header-univ{color:rgba(255,255,255,0.80);font-size:12px;}
+.header-name{color:#fff;font-size:30px;font-weight:900;letter-spacing:-1px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .header-school{color:rgba(255,255,255,0.80);font-size:13px;}
 .header-badge{display:inline-block;background:rgba(255,255,255,0.20);color:#fff;font-size:12px;font-weight:700;padding:5px 16px;border-radius:50px;border:1.5px solid rgba(255,255,255,0.40);align-self:flex-start;margin-top:2px;}
 
-/* ── TOTAL CARD ── */
-.total-card{margin:18px 16px 0;background:var(--white);border-radius:20px;padding:20px;box-shadow:var(--shadow);border-top:4px solid var(--red);}
-.total-label{font-size:11px;color:var(--subtext);font-weight:600;margin-bottom:10px;letter-spacing:0.3px;}
-.total-main{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:12px;}
-.total-score-val{font-size:40px;font-weight:900;color:var(--red);line-height:1;letter-spacing:-1px;}
-.total-score-sub{font-size:12px;color:var(--subtext);text-align:right;line-height:1.6;}
-.total-breakdown{display:flex;gap:8px;flex-wrap:wrap;}
-.total-chip{background:#f7f3f0;border-radius:10px;padding:6px 12px;font-size:12px;color:var(--text);}
-.total-chip b{color:var(--red);}
+/* TOTAL CARD */
+.total-card{margin:16px 16px 0;background:linear-gradient(135deg,var(--red),var(--orange));border-radius:20px;padding:20px 24px;color:#fff;box-shadow:0 8px 32px rgba(192,57,43,0.30);}
+.total-label{font-size:13px;opacity:.85;margin-bottom:4px;}
+.total-score{font-size:48px;font-weight:900;letter-spacing:-2px;line-height:1;}
+.total-sub{font-size:13px;opacity:.80;margin-top:4px;}
+.total-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;}
+.tb-item{background:rgba(255,255,255,0.15);border-radius:12px;padding:10px 8px;text-align:center;}
+.tb-item .val{font-size:20px;font-weight:800;}
+.tb-item .lbl{font-size:11px;opacity:.80;margin-top:2px;}
 
-/* ── OFFICIAL BANNER ── */
-.official-banner{margin:16px 16px 0;background:linear-gradient(135deg,#fff5f3 0%,#fff 100%);border-radius:20px;padding:20px;box-shadow:var(--shadow);border-left:5px solid var(--red);}
-.official-banner-title{font-size:12px;font-weight:800;color:var(--red);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:3px;}
-.official-banner-date{font-size:12px;color:var(--subtext);margin-bottom:14px;}
-.official-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.official-item{background:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);}
-.official-item-label{font-size:11px;color:var(--subtext);font-weight:600;margin-bottom:5px;}
-.official-item-value{font-size:22px;font-weight:900;color:var(--text);}
-.official-item-unit{font-size:11px;color:var(--subtext);margin-left:2px;}
-.official-item-score{font-size:11px;color:var(--red);font-weight:700;margin-top:4px;}
+/* OFFICIAL BANNER */
+.official-banner{margin:12px 16px 0;background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.08);border-left:4px solid var(--red);}
+.ob-title{font-size:12px;color:var(--sub);margin-bottom:8px;font-weight:600;}
+.ob-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.ob-item{text-align:center;}
+.ob-item .ov{font-size:18px;font-weight:800;color:var(--red);}
+.ob-item .ol{font-size:11px;color:var(--sub);margin-top:2px;}
 
-/* ── TABS ── */
-.tab-wrap{display:flex;gap:8px;padding:16px 16px 0;background:var(--bg);position:sticky;top:0;z-index:10;}
-.tab-btn{flex:1;padding:12px 0;border:none;border-radius:12px;background:#e8e0d8;color:#999;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;}
-.tab-btn.active{background:var(--red);color:#fff;box-shadow:0 4px 14px rgba(212,52,26,0.30);}
-.tab-content{display:none;}
-.tab-content.active{display:block;}
+/* ACAD CARD */
+.acad-card{margin:12px 16px 0;background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.08);}
+.acad-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;}
+.acad-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.acad-item{background:var(--bg);border-radius:12px;padding:12px 10px;text-align:center;}
+.acad-item .av{font-size:20px;font-weight:800;color:var(--dark);}
+.acad-item .al{font-size:11px;color:var(--sub);margin-top:2px;}
 
-/* ── CONTAINER ── */
-.container{padding:0 0 40px;}
+/* TABS */
+.tabs{display:flex;margin:16px 16px 0;background:#fff;border-radius:14px;padding:4px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.tab-btn{flex:1;padding:10px 0;border:none;background:transparent;border-radius:10px;font-size:14px;font-weight:600;color:var(--sub);cursor:pointer;transition:all .2s;}
+.tab-btn.active{background:var(--red);color:#fff;}
 
-/* ── ACAD CARD ── */
-.acad-card{margin:16px 16px 0;background:var(--white);border-radius:20px;padding:16px 20px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;border-left:4px solid var(--yellow);}
-.acad-label{font-size:12px;color:var(--subtext);font-weight:600;margin-bottom:2px;}
-.acad-value{font-size:28px;font-weight:900;color:var(--dark);}
-.acad-unit{font-size:13px;color:var(--subtext);margin-left:3px;}
+/* EVENT CARDS */
+.chart-area{padding:12px 16px 24px;}
+.event-card{background:#fff;border-radius:18px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,0.07);overflow:hidden;cursor:pointer;transition:box-shadow .2s;}
+.event-card:hover{box-shadow:0 4px 20px rgba(0,0,0,0.13);}
+.event-card-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 0;}
+.event-badge{background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+.event-toggle-icon{font-size:18px;color:var(--sub);transition:transform .3s;user-select:none;}
+.event-card.open .event-toggle-icon{transform:rotate(180deg);}
+.event-title{font-size:15px;font-weight:800;padding:6px 16px 0;}
+.event-meta{display:flex;gap:16px;padding:4px 16px 10px;}
+.event-best{font-size:13px;color:var(--sub);}
+.event-achieve{font-size:13px;font-weight:700;color:var(--red);}
+.progress-wrap{margin:0 16px 10px;background:var(--bg);border-radius:99px;height:6px;overflow:hidden;}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--red),var(--orange));border-radius:99px;transition:width .6s;}
+.chart-toggle{display:flex;gap:8px;padding:0 16px 8px;}
+.ct-btn{flex:1;padding:7px 0;border:1.5px solid var(--red);border-radius:10px;background:transparent;color:var(--red);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;}
+.ct-btn.active{background:var(--red);color:#fff;}
+canvas{display:block;padding:0 12px 12px;}
 
-/* ── EVENT CARD ── */
-.event-card{margin:16px 16px 0;background:var(--white);border-radius:20px;padding:20px;box-shadow:var(--shadow);cursor:pointer;transition:box-shadow .2s;}
-.event-card:active{box-shadow:0 2px 12px rgba(0,0,0,0.06);}
-.event-card-header-wrap{position:relative;}
-.event-toggle-icon{position:absolute;right:0;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:#f7f3f0;display:flex;align-items:center;justify-content:center;font-size:13px;transition:transform .3s;color:#aaa;}
-.event-card.open .event-toggle-icon{transform:translateY(-50%) rotate(180deg);}
-.event-header{display:flex;align-items:center;gap:14px;margin-bottom:16px;padding-right:36px;}
-.event-logo-box{width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:8px;}
-.event-logo-box img{width:100%;height:100%;object-fit:contain;}
-.el1{background:linear-gradient(135deg,#fff0ec,#ffd6c8);}
-.el2{background:linear-gradient(135deg,#fff3e0,#ffe0b2);}
-.el3{background:linear-gradient(135deg,#fff8e1,#ffecb3);}
-.el4{background:linear-gradient(135deg,#fce4ec,#f8bbd0);}
-.event-title{font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px;}
-.event-meta{font-size:11px;color:var(--subtext);}
-.stat-row{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:12px;}
-.best-label{font-size:11px;color:var(--subtext);margin-bottom:3px;}
-.best-record{font-size:34px;font-weight:900;line-height:1;}
-.best-unit{font-size:14px;color:var(--subtext);margin-left:3px;}
-.br1{color:var(--c1);}.br2{color:var(--c2);}.br3{color:var(--c3);}.br4{color:var(--c4);}
-.achievement{text-align:right;}
-.ach-label{font-size:11px;color:var(--subtext);margin-bottom:3px;}
-.ach-pct{font-size:28px;font-weight:900;}
-.ap1{color:var(--c1);}.ap2{color:var(--c2);}.ap3{color:var(--c3);}.ap4{color:var(--c4);}
-.progress-wrap{height:8px;background:#f0ece8;border-radius:50px;margin-bottom:6px;overflow:hidden;}
-.progress-bar{height:100%;border-radius:50px;transition:width 1s cubic-bezier(.4,0,.2,1);}
-.pb1{background:linear-gradient(90deg,#C44B0F,#e05c2a);}
-.pb2{background:linear-gradient(90deg,#D4341A,#e84d30);}
-.pb3{background:linear-gradient(90deg,#E8621A,#f0812a);}
-.pb4{background:linear-gradient(90deg,#F5A623,#f7c050);}
-.progress-meta{display:flex;justify-content:space-between;font-size:10px;color:var(--subtext);margin-bottom:14px;}
-.chart-toggle{display:flex;gap:6px;margin-bottom:12px;}
-.chart-toggle-btn{flex:1;padding:8px 0;border:1.5px solid #e0dbd8;border-radius:10px;background:#fff;color:#aaa;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;}
-.chart-toggle-btn.active{border-color:var(--red);color:var(--red);background:#fff5f3;}
-.chart-wrap{position:relative;height:190px;}
-
-/* ── 종목별 슬라이드 기록표 ── */
-.event-detail-table{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1);}
-.event-card.open .event-detail-table{max-height:800px;}
-.event-detail-inner{border-top:1.5px solid #f0ece8;margin-top:16px;padding-top:14px;}
-.event-detail-title{font-size:12px;font-weight:700;color:var(--subtext);margin-bottom:10px;letter-spacing:0.3px;}
-.event-detail-wrap{overflow-x:auto;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.06);}
-.event-detail-wrap table{width:100%;border-collapse:collapse;background:#fff;font-size:12px;}
-.event-detail-wrap th{padding:9px 12px;text-align:center;font-weight:700;white-space:nowrap;font-size:11px;}
-.event-detail-wrap td{padding:9px 12px;text-align:center;border-bottom:1px solid #f5f0ee;color:var(--text);}
+/* DETAIL TABLE (slide-down) */
+.event-detail-table{max-height:0;overflow:hidden;transition:max-height .4s ease;}
+.event-card.open .event-detail-table{max-height:600px;}
+.event-detail-wrap{padding:0 14px 14px;}
+.event-detail-wrap table{width:100%;border-collapse:collapse;font-size:13px;}
+.event-detail-wrap th{background:var(--bg);color:var(--sub);font-weight:700;padding:8px 6px;text-align:center;border-bottom:2px solid #e0e0e0;}
+.event-detail-wrap td{padding:8px 6px;text-align:center;border-bottom:1px solid #f0f0f0;}
 .event-detail-wrap tr:last-child td{border-bottom:none;}
-.event-detail-wrap tr.official-row td{background:#fff8f7;}
+.official-row td{background:#fff5f5;font-weight:700;color:var(--red);}
+.official-tag{display:inline-block;background:var(--red);color:#fff;font-size:10px;padding:2px 6px;border-radius:6px;margin-left:4px;}
 
-/* ── TABLE TAB ── */
-.table-section{margin:16px 16px 0;}
-.table-section-title{font-size:13px;color:var(--subtext);font-weight:700;margin-bottom:10px;letter-spacing:0.3px;}
-.table-wrap{overflow-x:auto;border-radius:16px;box-shadow:var(--shadow);}
-table{width:100%;border-collapse:collapse;background:#fff;font-size:11px;min-width:520px;}
-th{background:var(--red);color:#fff;padding:10px 8px;text-align:center;font-weight:700;white-space:nowrap;}
-td{padding:9px 8px;text-align:center;border-bottom:1px solid #f5f0ee;color:var(--text);}
-tr:last-child td{border-bottom:none;}
-tr.official-row td{background:#fff8f7;}
-.tag-official{display:inline-block;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:5px;margin-top:3px;}
-.tag-monthly{display:inline-block;background:#f0ece8;color:#aaa;font-size:9px;font-weight:600;padding:2px 5px;border-radius:5px;margin-top:3px;}
+/* TABLE TAB */
+.table-area{padding:12px 16px 24px;overflow-x:auto;}
+.rec-table{width:100%;border-collapse:collapse;font-size:12px;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.07);}
+.rec-table th{background:var(--dark);color:#fff;padding:10px 8px;text-align:center;white-space:nowrap;}
+.rec-table td{padding:9px 8px;text-align:center;border-bottom:1px solid #f0f0f0;white-space:nowrap;}
+.rec-table tr.official-row{background:#fff0f0;}
+.rec-table tr.official-row td{font-weight:700;color:var(--red);}
+.tag{display:inline-block;font-size:10px;padding:2px 6px;border-radius:6px;font-weight:700;}
+.tag-official{background:var(--red);color:#fff;}
+.tag-monthly{background:#eee;color:#555;}
 
-/* ── MISC ── */
-.loading{text-align:center;padding:60px 20px;color:var(--subtext);font-size:15px;line-height:1.8;}
+/* LOADING / ERROR */
+.loading,.error{text-align:center;padding:60px 20px;font-size:15px;color:var(--sub);}
+.error{color:var(--red);}
 </style>
 </head>
 <body>
-
-<div class="header">
-  <div class="header-inner">
-    <div class="header-logo-box" id="logoBox">
-      <img src="images/dongguk.png" alt="동국대학교"
-        onerror="document.getElementById('logoBox').innerHTML='<span class=\'header-logo-text\'>동국대학교</span>'">
-    </div>
-    <div class="header-info-col">
-      <div class="header-univ" id="hUniv">Dongguk University · 체육교육과</div>
-      <div class="header-name" id="hName">···</div>
-      <div class="header-school" id="hSchool"></div>
-      <div class="header-badge" id="hBadge">로딩 중</div>
-    </div>
-  </div>
-</div>
-
-<div class="total-card" id="totalCard" style="display:none;">
-  <div class="total-label">📊 최근 기록 총점 · 내신환산 + 실기합계 × 1.75</div>
-  <div class="total-main">
-    <div><span class="total-score-val" id="totalScore">—</span></div>
-    <div class="total-score-sub" id="totalScoreSub"></div>
-  </div>
-  <div class="total-breakdown" id="totalBreakdown"></div>
-</div>
-
-<div id="officialBanner"></div>
-
-<div class="tab-wrap">
-  <button class="tab-btn active" onclick="switchTab('chart')">📊 차트</button>
-  <button class="tab-btn" onclick="switchTab('table')">📋 기록표</button>
-</div>
-
-<div class="container">
-  <div class="tab-content active" id="tab-chart">
-    <div id="acadCard" style="display:none;" class="acad-card">
-      <div><div class="acad-label">🎓 내신환산 점수</div></div>
-      <div><span class="acad-value" id="acadVal">—</span><span class="acad-unit">점</span></div>
-    </div>
-    <div id="chartArea"><div class="loading">⏳ 데이터 불러오는 중...</div></div>
-  </div>
-  <div class="tab-content" id="tab-table">
-    <div id="tableArea"></div>
-  </div>
-</div>
+<div id="chartArea"><div class="loading">⏳ 데이터 불러오는 중...</div></div>
 
 <script>
+/* ───────────── CONSTANTS ───────────── */
 const SHEET_ID  = '1-uvH7koGGIEYXO8mL56xVUbUWXEbNPVuVP3htZ2wQMY';
 const SHEET_TAB = '기록데이터';
 const LOGO_SRC  = 'images/dongguk.png';
@@ -198,371 +126,332 @@ const STD = {
 };
 
 const EVENTS = [
-  {key:'strength',label:'배근력',              unit:'kg',ci:'1',col:8, scol:9 },
-  {key:'flex',    label:'앉아 윗몸 앞으로 굽히기',unit:'cm',ci:'2',col:10,scol:11},
-  {key:'jump',    label:'제자리 멀리뛰기',       unit:'cm',ci:'3',col:12,scol:13},
-  {key:'run',     label:'중량달리기',            unit:'초',ci:'4',col:14,scol:15}
+  {key:'strength',label:'배근력',         unit_label:'kg',ci:'1',col:8, scol:9 },
+  {key:'flex',    label:'앉아윗몸앞으로굽히기',unit_label:'cm',ci:'2',col:10,scol:11},
+  {key:'jump',    label:'제자리멀리뛰기',   unit_label:'cm',ci:'3',col:12,scol:13},
+  {key:'run',     label:'중량달리기',       unit_label:'초',ci:'4',col:14,scol:15}
 ];
 
-const LINE_C = [
-  {line:'#C44B0F',fill:'rgba(196,75,15,0.07)'},
-  {line:'#D4341A',fill:'rgba(212,52,26,0.07)'},
-  {line:'#E8621A',fill:'rgba(232,98,26,0.07)'},
-  {line:'#F5A623',fill:'rgba(245,166,35,0.07)'}
-];
-const BAR_C = [
-  'rgba(196,75,15,0.80)','rgba(212,52,26,0.80)',
-  'rgba(232,98,26,0.80)','rgba(245,166,35,0.80)'
-];
-
-let chartInst={}, chartTypes={}, studentData=null;
-const urlName = new URLSearchParams(window.location.search).get('name')||'';
+/* ───────────── CSV ───────────── */
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_TAB)}`;
 
-fetch(CSV_URL).then(r=>r.text()).then(csv=>{
-  const rows=parseCSV(csv);
-  const data=parseStudent(rows,urlName);
-  if(!data){
-    document.getElementById('chartArea').innerHTML=`<div class="loading">❌ <b>${urlName||'(이름 없음)'}</b> 데이터를 찾을 수 없어요.</div>`;
-    return;
-  }
-  studentData=data;
-  renderHeader(data);
-  renderTotalCard(data);
-  renderOfficialBanner(data);
-  renderAcadCard(data);
-  renderChartTab(data);
-  renderTableTab(data);
-}).catch(()=>{
-  document.getElementById('chartArea').innerHTML='<div class="loading">❌ 데이터를 불러올 수 없어요.<br>구글 시트 공개 설정을 확인해주세요.</div>';
-});
-
 function parseCSV(text){
-  return text.trim().split('\n').map(line=>{
-    const res=[];let cur='',inQ=false;
-    for(const ch of line){
-      if(ch==='"'){inQ=!inQ;}
-      else if(ch===','&&!inQ){res.push(cur.trim());cur='';}
-      else{cur+=ch;}
-    }
-    res.push(cur.trim());
-    return res;
-  });
+  const rows=[];
+  const re=/("(?:[^"]|"")*"|[^,\n\r]*)/g;
+  let row=[];
+  let m;
+  while((m=re.exec(text))!==null){
+    let v=m[1];
+    if(v.startsWith('"')&&v.endsWith('"'))v=v.slice(1,-1).replace(/""/g,'"');
+    row.push(v.trim());
+    const next=text[re.lastIndex];
+    if(next==='\n'||next==='\r'||re.lastIndex>=text.length){rows.push(row);row=[];if(next==='\r'&&text[re.lastIndex+1]==='\n')re.lastIndex++;}
+    else if(next===',')re.lastIndex++;
+  }
+  return rows;
 }
 
-function parseVal(v){
-  if(v===undefined||v===null)return null;
-  const s=String(v).trim();
-  if(s==='')return null;
-  if(s==='미응시')return '미응시';
-  const n=parseFloat(s);
-  return isNaN(n)?null:n;
-}
+function parseVal(v){if(!v||v.trim()==='')return null;const n=parseFloat(v.replace(/,/g,''));return isNaN(n)?null:n;}
 
-function parseStudent(rows,name){
-  if(!name)return null;
-  const official=[],monthly=[];
-  let gender='남',school='',univ='',dept='',acadScore=null;
+function parseStudent(name,rows){
+  const records=[];
   for(let i=1;i<rows.length;i++){
     const r=rows[i];
-    if(!r[2]||r[2]!==name)continue;
-    gender=r[3]||'남';school=r[4]||'';univ=r[5]||'';dept=r[6]||'';
-    const hv=r[7]?parseFloat(r[7]):NaN;
-    if(!isNaN(hv))acadScore=hv;
-    const item={
-      type:r[0]||'',date:r[1]||'',
-      strength:parseVal(r[8]),strScore:parseVal(r[9]),
-      flex:parseVal(r[10]),flxScore:parseVal(r[11]),
-      jump:parseVal(r[12]),jmpScore:parseVal(r[13]),
-      run:parseVal(r[14]),runScore:parseVal(r[15]),
-      total:parseVal(r[16])
+    if(!r||r.length<2)continue;
+    if((r[2]||'').trim()!==name)continue;
+    const gender=(r[3]||'').trim();
+    const gKey=gender==='여'?'여':'남';
+    const std=STD[gKey];
+    const makeScore=(key,raw)=>{
+      if(raw===null)return null;
+      const s=std[key];
+      if(s.higher){if(raw>=s.max)return 100;if(raw<=s.min)return 0;return Math.round((raw-s.min)/(s.max-s.min)*100*100)/100;}
+      else{if(raw<=s.max)return 100;if(raw>=s.min)return 0;return Math.round((s.min-raw)/(s.min-s.max)*100*100)/100;}
     };
-    if(r[0]&&r[0].includes('공식'))official.push(item);
-    else monthly.push(item);
+    const strVal=parseVal(r[8]);
+    const flexVal=parseVal(r[10]);
+    const jumpVal=parseVal(r[12]);
+    const runVal=parseVal(r[14]);
+    const acadVal=parseVal(r[7]);
+    const totalVal=parseVal(r[16]);
+    records.push({
+      type:(r[0]||'').trim(),
+      date:(r[1]||'').trim(),
+      name:(r[2]||'').trim(),
+      gender:gKey,
+      school:(r[4]||'').trim(),
+      univ:(r[5]||'').trim(),
+      dept:(r[6]||'').trim(),
+      acad:acadVal,
+      strength:strVal, strScore:parseVal(r[9])??makeScore('strength',strVal),
+      flex:flexVal,    flexScore:parseVal(r[11])??makeScore('flex',flexVal),
+      jump:jumpVal,    jumpScore:parseVal(r[13])??makeScore('jump',jumpVal),
+      run:runVal,      runScore:parseVal(r[15])??makeScore('run',runVal),
+      total:totalVal
+    });
   }
-  if(!official.length&&!monthly.length)return null;
-  monthly.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
-  return{name,gender,school,univ,dept,acadScore,official,monthly};
+  records.sort((a,b)=>{
+    const da=a.date.replace(/\./g,'');
+    const db=b.date.replace(/\./g,'');
+    return da<db?-1:da>db?1:0;
+  });
+  return records;
 }
 
-function renderHeader(d){
-  const univStr=[d.univ,d.dept].filter(Boolean).join(' · ')||'Dongguk University';
-  document.getElementById('hUniv').textContent=univStr;
-  document.getElementById('hName').textContent=d.name;
-  document.getElementById('hSchool').textContent=d.school||'';
-  document.getElementById('hBadge').textContent=d.gender==='여'?'👩 여성':'🧑 남성';
-}
+/* ───────────── RENDER ───────────── */
+let CHARTS={};
 
-function renderTotalCard(d){
-  const allSorted=[...d.official,...d.monthly].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
-  let recent=null;
-  for(const r of allSorted){if(r.total!==null&&typeof r.total==='number'){recent=r;break;}}
-  if(!recent)return;
-  document.getElementById('totalCard').style.display='';
-  document.getElementById('totalScore').textContent=recent.total.toFixed(2);
-  const acad=d.acadScore!==null?d.acadScore:0;
-  document.getElementById('totalScoreSub').innerHTML=
-    `실기만점 700${d.acadScore!==null?` + 내신 ${d.acadScore}`:''}<br>최대 ${(700+acad).toFixed(2)}점`;
-  const scores=[recent.strScore,recent.flxScore,recent.jmpScore,recent.runScore].filter(v=>typeof v==='number');
-  const practSum=scores.reduce((a,c)=>a+c,0);
-  document.getElementById('totalBreakdown').innerHTML=[
-    d.acadScore!==null?`<div class="total-chip">🎓 내신환산 <b>${d.acadScore}</b></div>`:'',
-    `<div class="total-chip">💪 실기합계(×1.75) <b>${(practSum*1.75).toFixed(2)}</b></div>`
-  ].join('');
-}
-
-function renderOfficialBanner(d){
-  const banner=document.getElementById('officialBanner');
-  if(!d.official.length){banner.innerHTML='';return;}
-  const ov=d.official[d.official.length-1];
-  const std=STD[d.gender]||STD['남'];
-  banner.innerHTML=`
-    <div class="official-banner">
-      <div class="official-banner-title">🏅 공식 테스트 최근 기록</div>
-      <div class="official-banner-date">측정일 : ${ov.date}</div>
-      <div class="official-grid">
-        ${makeOB('배근력',ov.strength,std.strength.unit,ov.strScore)}
-        ${makeOB('좌전굴',ov.flex,std.flex.unit,ov.flxScore)}
-        ${makeOB('멀리뛰기',ov.jump,std.jump.unit,ov.jmpScore)}
-        ${makeOB('중량달리기',ov.run,std.run.unit,ov.runScore)}
+function renderHeader(r,el){
+  const first=r[0]||{};
+  el.innerHTML=`
+  <div class="header">
+    <div class="header-inner">
+      <div class="header-logo-box">
+        <img src="${LOGO_SRC}" alt="로고" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span class="header-logo-text" style="display:none">${first.univ||'대학교'}</span>
       </div>
-    </div>`;
-}
-
-function makeOB(label,val,unit,score){
-  const vStr=val===null?'-':(val==='미응시'?'미응시':String(val));
-  const uStr=(val!==null&&val!=='미응시')?unit:'';
-  const sEl=typeof score==='number'
-    ?`<div class="official-item-score">환산 ${score.toFixed(4)}점</div>`
-    :(score==='미응시'?'<div class="official-item-score">미응시 (0점)</div>':'');
-  return`<div class="official-item">
-    <div class="official-item-label">${label}</div>
-    <span class="official-item-value">${vStr}</span>
-    <span class="official-item-unit">${uStr}</span>
-    ${sEl}
+      <div class="header-info-col">
+        <div class="header-univ">${first.univ||''} · ${first.dept||''}</div>
+        <div class="header-name">${first.name||''}</div>
+        <div class="header-school">${first.school||''}</div>
+        <div class="header-badge">${first.gender==='여'?'여자':'남자'}</div>
+      </div>
+    </div>
   </div>`;
 }
 
-function renderAcadCard(d){
-  const card=document.getElementById('acadCard');
-  if(d.acadScore!==null){card.style.display='';document.getElementById('acadVal').textContent=d.acadScore;}
-  else{card.style.display='none';}
+function renderTotalCard(r,el){
+  const official=r.filter(x=>x.type==='공식테스트');
+  const last=official.length?official[official.length-1]:r[r.length-1];
+  if(!last){el.innerHTML='';return;}
+  const acad=last.acad??0;
+  const events=[last.strScore,last.flexScore,last.jumpScore,last.runScore];
+  const allHave=events.every(v=>v!==null);
+  let total=last.total;
+  if(total===null&&allHave){
+    const sum=events.reduce((a,b)=>a+b,0);
+    total=Math.round((acad+sum*1.75)*100)/100;
+  }
+  const scoreSum=allHave?events.reduce((a,b)=>a+b,0):null;
+  el.innerHTML=`
+  <div class="total-card">
+    <div class="total-label">최종 총점 (내신환산 + 실기×1.75)</div>
+    <div class="total-score">${total!==null?total.toFixed(2):'—'}</div>
+    <div class="total-sub">내신환산 ${acad.toFixed(2)} + 실기합 ${scoreSum!==null?scoreSum.toFixed(2):'—'} × 1.75</div>
+    <div class="total-breakdown">
+      <div class="tb-item"><div class="val">${last.strScore!==null?last.strScore.toFixed(2):'—'}</div><div class="lbl">배근력 점수</div></div>
+      <div class="tb-item"><div class="val">${last.flexScore!==null?last.flexScore.toFixed(2):'—'}</div><div class="lbl">좌전굴 점수</div></div>
+      <div class="tb-item"><div class="val">${last.jumpScore!==null?last.jumpScore.toFixed(2):'—'}</div><div class="lbl">멀리뛰기 점수</div></div>
+      <div class="tb-item"><div class="val">${last.runScore!==null?last.runScore.toFixed(2):'—'}</div><div class="lbl">달리기 점수</div></div>
+      <div class="tb-item"><div class="val">${acad.toFixed(2)}</div><div class="lbl">내신환산</div></div>
+      <div class="tb-item"><div class="val">${total!==null?total.toFixed(2):'—'}</div><div class="lbl">총점</div></div>
+    </div>
+  </div>`;
 }
 
-function switchTab(name){
-  document.querySelectorAll('.tab-btn').forEach((b,i)=>{b.classList.toggle('active',['chart','table'][i]===name);});
-  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
+function renderOfficialBanner(r,el){
+  const off=r.filter(x=>x.type==='공식테스트');
+  if(!off.length){el.innerHTML='';return;}
+  const last=off[off.length-1];
+  el.innerHTML=`
+  <div class="official-banner">
+    <div class="ob-title">📋 공식 테스트 최신 기록 (${last.date})</div>
+    <div class="ob-grid">
+      <div class="ob-item"><div class="ov">${last.strength??'—'} <small>kg</small></div><div class="ol">배근력</div></div>
+      <div class="ob-item"><div class="ov">${last.flex??'—'} <small>cm</small></div><div class="ol">좌전굴</div></div>
+      <div class="ob-item"><div class="ov">${last.jump??'—'} <small>cm</small></div><div class="ol">멀리뛰기</div></div>
+      <div class="ob-item"><div class="ov">${last.run??'—'} <small>초</small></div><div class="ol">달리기</div></div>
+    </div>
+  </div>`;
 }
 
-function renderChartTab(d){
-  const area=document.getElementById('chartArea');
-  area.innerHTML='';
-  const std=STD[d.gender]||STD['남'];
-  const mData=d.monthly;
-  const labels=mData.map(r=>r.date);
-
-  EVENTS.forEach((ev,idx)=>{
-    const s=std[ev.key];
-    const values=mData.map(r=>{const v=r[ev.key];return(v!==null&&v!=='미응시')?v:null;});
-    const valid=values.filter(v=>v!==null);
-    const best=valid.length?(s.higher?Math.max(...valid):Math.min(...valid)):null;
-    let pct=0;
-    if(best!==null){
-      pct=s.higher?Math.round((best-s.min)/(s.max-s.min)*100):Math.round((s.min-best)/(s.min-s.max)*100);
-      pct=Math.max(0,Math.min(100,pct));
-    }
-
-    const card=document.createElement('div');
-    card.className='event-card';
-    card.innerHTML=`
-      <div class="event-card-header-wrap">
-        <div class="event-header">
-          <div class="event-logo-box el${ev.ci}">
-            <img src="${LOGO_SRC}" alt="동국대"
-              onerror="this.parentElement.innerHTML='<span style=font-size:22px>🏅</span>'">
-          </div>
-          <div>
-            <div class="event-title">${ev.label}</div>
-            <div class="event-meta">단위: ${s.unit} &nbsp;|&nbsp; 만점: ${s.max}${s.unit}</div>
-          </div>
-        </div>
-        <div class="event-toggle-icon">▼</div>
-      </div>
-      <div class="stat-row">
-        <div>
-          <div class="best-label">월별 최고기록</div>
-          <span class="best-record br${ev.ci}">${best!==null?best:'-'}</span>
-          <span class="best-unit">${best!==null?s.unit:''}</span>
-        </div>
-        <div class="achievement">
-          <div class="ach-label">만점 달성률</div>
-          <div class="ach-pct ap${ev.ci}">${pct}%</div>
-        </div>
-      </div>
-      <div class="progress-wrap">
-        <div class="progress-bar pb${ev.ci}" id="pb_${ev.key}" style="width:0%"></div>
-      </div>
-      <div class="progress-meta">
-        <span>최저 ${s.min}${s.unit}</span>
-        <span>만점 ${s.max}${s.unit}</span>
-      </div>
-      <div class="chart-toggle">
-        <button class="chart-toggle-btn active" id="btn_line_${ev.key}"
-          onclick="event.stopPropagation();switchChartType('${ev.key}','line')">꺾은선</button>
-        <button class="chart-toggle-btn" id="btn_bar_${ev.key}"
-          onclick="event.stopPropagation();switchChartType('${ev.key}','bar')">막대</button>
-      </div>
-      <div class="chart-wrap">
-        <canvas id="chart_${ev.key}"></canvas>
-      </div>
-      <div class="event-detail-table" id="detail_${ev.key}">
-        <div class="event-detail-inner">
-          <div class="event-detail-title">📋 ${ev.label} 전체 기록</div>
-          <div class="event-detail-wrap">${buildDetailTable(ev.key,ev.unit,d)}</div>
-        </div>
-      </div>`;
-    area.appendChild(card);
-
-    card.addEventListener('click',function(e){
-      if(e.target.closest('.chart-toggle'))return;
-      this.classList.toggle('open');
-    });
-
-    setTimeout(()=>{
-      const pb=document.getElementById('pb_'+ev.key);
-      if(pb)pb.style.width=pct+'%';
-    },150);
-
-    chartTypes[ev.key]='line';
-    buildChart(ev.key,'line',labels,values,s,idx);
-  });
+function renderAcadCard(r,el){
+  const off=r.filter(x=>x.type==='공식테스트');
+  const last=off.length?off[off.length-1]:r[r.length-1];
+  if(!last||last.acad===null){el.innerHTML='';return;}
+  const acad=last.acad;
+  el.innerHTML=`
+  <div class="acad-card">
+    <div class="acad-title">📚 내신환산 점수</div>
+    <div class="acad-grid">
+      <div class="acad-item"><div class="av">${acad.toFixed(2)}</div><div class="al">내신환산 점수</div></div>
+      <div class="acad-item"><div class="av">${((acad/300)*100).toFixed(1)}%</div><div class="al">내신 달성률 (300점 기준)</div></div>
+    </div>
+  </div>`;
 }
 
-function buildDetailTable(key,unit,d){
-  const scoreKeyMap={strength:'strScore',flex:'flxScore',jump:'jmpScore',run:'runScore'};
-  const allRows=[
-    ...d.official.map(r=>({...r,isOfficial:true})),
-    ...d.monthly.map(r=>({...r,isOfficial:false}))
-  ].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
-  const fmtV=v=>v===null?'-':(v==='미응시'?'미응시':String(v));
-  const fmtS=v=>{
-    if(v===null)return'-';
-    if(v==='미응시')return'0';
-    return typeof v==='number'?v.toFixed(4):'-';
-  };
-  let html=`<table>
-    <thead><tr style="background:var(--red);">
-      <th style="color:#fff">날짜</th>
-      <th style="color:#fff">기록(${unit})</th>
-      <th style="color:#fff">환산점수</th>
-    </tr></thead><tbody>`;
-  allRows.forEach(r=>{
-    const cls=r.isOfficial?'official-row':'';
-    const tag=r.isOfficial
-      ?`<span class="tag-official">공식</span>`
-      :`<span class="tag-monthly">연습</span>`;
-    html+=`<tr class="${cls}">
-      <td>${r.date} ${tag}</td>
-      <td><b>${fmtV(r[key])}</b></td>
-      <td>${fmtS(r[scoreKeyMap[key]])}</td>
+function buildDetailTable(records,key,label,unit){
+  if(!records.length)return '<p style="text-align:center;padding:12px;color:#aaa">기록 없음</p>';
+  const rows=records.map(rec=>{
+    const valMap={strength:rec.strength,flex:rec.flex,jump:rec.jump,run:rec.run};
+    const sMap={strength:rec.strScore,flex:rec.flexScore,jump:rec.jumpScore,run:rec.runScore};
+    const v=valMap[key];const s=sMap[key];
+    const isOff=rec.type==='공식테스트';
+    return `<tr class="${isOff?'official-row':''}">
+      <td>${rec.date}${isOff?'<span class="official-tag">공식</span>':''}</td>
+      <td>${v!==null?v+' '+unit:'—'}</td>
+      <td>${s!==null?s.toFixed(2):'—'}</td>
     </tr>`;
-  });
-  html+=`</tbody></table>`;
-  return html;
+  }).join('');
+  return `<div class="event-detail-wrap"><table>
+    <thead><tr><th>날짜</th><th>기록</th><th>환산점수</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
 }
 
-function buildChart(key,type,labels,values,s,idx){
-  const canvas=document.getElementById('chart_'+key);
-  if(!canvas)return;
-  if(chartInst[key]){chartInst[key].destroy();delete chartInst[key];}
-  const lc=LINE_C[idx];
-  const isLine=(type==='line');
-  chartInst[key]=new Chart(canvas,{
-    type:isLine?'line':'bar',
+function renderChartTab(records,el){
+  Object.values(CHARTS).forEach(c=>c.destroy());CHARTS={};
+  const keyMap={strength:'strScore',flex:'flexScore',jump:'jumpScore',run:'runScore'};
+  const rawMap={strength:'strength',flex:'flex',jump:'jump',run:'run'};
+  const unitMap={strength:'kg',flex:'cm',jump:'cm',run:'초'};
+  let html='<div class="chart-area">';
+  EVENTS.forEach(ev=>{
+    const scores=records.map(x=>x[keyMap[ev.key]]);
+    const best=Math.max(...scores.filter(s=>s!==null));
+    const latest=scores.filter(s=>s!==null).slice(-1)[0]??0;
+    const pct=Math.min(100,Math.round(latest));
+    const detail=buildDetailTable(records,ev.key,ev.label,unitMap[ev.key]);
+    html+=`
+    <div class="event-card" id="card-${ev.key}" onclick="toggleCard('${ev.key}',event)">
+      <div class="event-card-header">
+        <span class="event-badge">종목 ${ev.ci}</span>
+        <span class="event-toggle-icon" id="icon-${ev.key}">▼</span>
+      </div>
+      <div class="event-title">${ev.label}</div>
+      <div class="event-meta">
+        <span class="event-best">최고 ${best!==null&&isFinite(best)?best.toFixed(2):'—'} 점</span>
+        <span class="event-achieve">달성률 ${pct}%</span>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar" style="width:${pct}%"></div></div>
+      <div class="chart-toggle">
+        <button class="ct-btn active" id="btn-line-${ev.key}" onclick="switchChartType('${ev.key}','line',event)">꺾은선</button>
+        <button class="ct-btn" id="btn-bar-${ev.key}" onclick="switchChartType('${ev.key}','bar',event)">막대</button>
+      </div>
+      <canvas id="canvas-${ev.key}" height="160"></canvas>
+      <div class="event-detail-table" id="detail-${ev.key}">${detail}</div>
+    </div>`;
+  });
+  html+='</div>';
+  el.innerHTML=html;
+  EVENTS.forEach(ev=>{buildChart(ev.key,records,keyMap[ev.key],'line');});
+}
+
+function buildChart(key,records,scoreKey,type){
+  const ctx=document.getElementById('canvas-'+key);
+  if(!ctx)return;
+  if(CHARTS[key])CHARTS[key].destroy();
+  const labels=records.map(r=>r.date);
+  const data=records.map(r=>r[scoreKey]);
+  const isOff=records.map(r=>r.type==='공식테스트');
+  const ptColors=isOff.map(o=>o?'#c0392b':'#e67e22');
+  const ptRadius=isOff.map(o=>o?7:4);
+  CHARTS[key]=new Chart(ctx,{
+    type,
     data:{
       labels,
-      datasets:[
-        {label:s.unit,data:values,
-          borderColor:isLine?lc.line:undefined,
-          backgroundColor:isLine?lc.fill:BAR_C[idx],
-          borderWidth:isLine?2.5:0,
-          pointRadius:isLine?5:0,
-          pointBackgroundColor:isLine?lc.line:undefined,
-          fill:isLine,tension:0.35,spanGaps:true,borderRadius:isLine?0:8},
-        {label:'만점기준',data:Array(labels.length).fill(s.max),
-          borderColor:'#ff5252',borderWidth:1.5,borderDash:[5,4],
-          pointRadius:0,type:'line',fill:false,tension:0}
-      ]
+      datasets:[{
+        label:'환산점수',data,
+        borderColor:'#c0392b',backgroundColor:type==='bar'?'rgba(192,57,43,0.7)':'rgba(192,57,43,0.15)',
+        fill:type==='line',tension:0.3,
+        pointBackgroundColor:ptColors,pointRadius:ptRadius,pointBorderWidth:2,pointBorderColor:'#fff'
+      }]
     },
-    options:{
-      responsive:true,maintainAspectRatio:false,animation:{duration:600},
-      plugins:{
-        legend:{display:false},
-        tooltip:{callbacks:{label:ctx=>ctx.dataset.label==='만점기준'
-          ?`만점기준: ${s.max}${s.unit}`
-          :(ctx.parsed.y!==null?`${ctx.parsed.y}${s.unit}`:'미응시')}}
-      },
-      scales:{
-        x:{grid:{display:false},ticks:{font:{size:11},color:'#aaa'}},
-        y:{grid:{color:'#f5f0ee'},ticks:{font:{size:11},color:'#aaa'}}
-      }
-    }
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{min:0,max:100,ticks:{stepSize:20}}}}
   });
 }
 
-function switchChartType(key,type){
-  if(chartTypes[key]===type)return;
-  chartTypes[key]=type;
-  document.getElementById('btn_line_'+key).classList.toggle('active',type==='line');
-  document.getElementById('btn_bar_'+key).classList.toggle('active',type==='bar');
-  const d=studentData;
-  const std=STD[d.gender]||STD['남'];
-  const ev=EVENTS.find(e=>e.key===key);
-  const idx=EVENTS.indexOf(ev);
-  const s=std[key];
-  const labels=d.monthly.map(r=>r.date);
-  const values=d.monthly.map(r=>{const v=r[key];return(v!==null&&v!=='미응시')?v:null;});
-  buildChart(key,type,labels,values,s,idx);
+function switchChartType(key,type,e){
+  e.stopPropagation();
+  ['line','bar'].forEach(t=>{
+    const b=document.getElementById(`btn-${t}-${key}`);
+    if(b)b.classList.toggle('active',t===type);
+  });
+  const records=window._RECORDS||[];
+  const keyMap={strength:'strScore',flex:'flexScore',jump:'jumpScore',run:'runScore'};
+  buildChart(key,records,keyMap[key],type);
 }
 
-function renderTableTab(d){
-  const area=document.getElementById('tableArea');
-  const allRows=[
-    ...d.official.map(r=>({...r,isOfficial:true})),
-    ...d.monthly.map(r=>({...r,isOfficial:false}))
-  ].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
-  const fmtV=v=>v===null?'-':(v==='미응시'?'미응시':String(v));
-  const fmtS=v=>{if(v===null)return'-';if(v==='미응시')return'0';return typeof v==='number'?v.toFixed(4):String(v);};
-  const fmtT=v=>{if(v===null||v==='미응시')return'-';return typeof v==='number'?v.toFixed(2):String(v);};
-  let html=`<div class="table-section">
-    <div class="table-section-title">전체 기록표</div>
-    <div class="table-wrap"><table>
-      <thead><tr>
-        <th>날짜</th>
-        <th>배근력<br><small style="opacity:.75;font-weight:400">kg</small></th><th>점수</th>
-        <th>좌전굴<br><small style="opacity:.75;font-weight:400">cm</small></th><th>점수</th>
-        <th>멀리뛰기<br><small style="opacity:.75;font-weight:400">cm</small></th><th>점수</th>
-        <th>달리기<br><small style="opacity:.75;font-weight:400">초</small></th><th>점수</th>
-        <th>총점</th>
-      </tr></thead><tbody>`;
-  allRows.forEach(r=>{
-    const cls=r.isOfficial?'official-row':'';
-    const tag=r.isOfficial
-      ?`<br><span class="tag-official">공식</span>`
-      :`<br><span class="tag-monthly">연습</span>`;
-    html+=`<tr class="${cls}">
-      <td>${r.date}${tag}</td>
-      <td>${fmtV(r.strength)}</td><td>${fmtS(r.strScore)}</td>
-      <td>${fmtV(r.flex)}</td><td>${fmtS(r.flxScore)}</td>
-      <td>${fmtV(r.jump)}</td><td>${fmtS(r.jmpScore)}</td>
-      <td>${fmtV(r.run)}</td><td>${fmtS(r.runScore)}</td>
-      <td><b>${fmtT(r.total)}</b></td>
+function toggleCard(key,e){
+  if(e.target.closest('.chart-toggle'))return;
+  const card=document.getElementById('card-'+key);
+  if(card)card.classList.toggle('open');
+}
+
+function renderTableTab(records,el){
+  let rows=records.map(r=>{
+    const acad=r.acad??0;
+    const events=[r.strScore,r.flexScore,r.jumpScore,r.runScore];
+    const allHave=events.every(v=>v!==null);
+    let tot=r.total;
+    if(tot===null&&allHave)tot=Math.round((acad+events.reduce((a,b)=>a+b,0)*1.75)*100)/100;
+    const isOff=r.type==='공식테스트';
+    return `<tr class="${isOff?'official-row':''}">
+      <td><span class="tag ${isOff?'tag-official':'tag-monthly'}">${r.type}</span></td>
+      <td>${r.date}</td>
+      <td>${r.strength??'—'}</td><td>${r.strScore!==null?r.strScore.toFixed(2):'—'}</td>
+      <td>${r.flex??'—'}</td><td>${r.flexScore!==null?r.flexScore.toFixed(2):'—'}</td>
+      <td>${r.jump??'—'}</td><td>${r.jumpScore!==null?r.jumpScore.toFixed(2):'—'}</td>
+      <td>${r.run??'—'}</td><td>${r.runScore!==null?r.runScore.toFixed(2):'—'}</td>
+      <td>${r.acad!==null?r.acad.toFixed(2):'—'}</td>
+      <td><strong>${tot!==null?tot.toFixed(2):'—'}</strong></td>
     </tr>`;
-  });
-  html+=`</tbody></table></div></div>`;
-  area.innerHTML=html;
+  }).join('');
+  el.innerHTML=`<div class="table-area"><table class="rec-table">
+    <thead><tr>
+      <th>구분</th><th>날짜</th>
+      <th>배근력</th><th>점수</th>
+      <th>좌전굴</th><th>점수</th>
+      <th>멀리뛰기</th><th>점수</th>
+      <th>달리기</th><th>점수</th>
+      <th>내신환산</th><th>총점</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
 }
+
+/* ───────────── MAIN ───────────── */
+(async()=>{
+  const app=document.getElementById('chartArea');
+  const name=new URLSearchParams(location.search).get('name')||'';
+  if(!name){app.innerHTML='<div class="error">❌ URL에 ?name=학생이름 을 추가해주세요.</div>';return;}
+  try{
+    const res=await fetch(CSV_URL);
+    if(!res.ok)throw new Error('fetch failed');
+    const text=await res.text();
+    const rows=parseCSV(text);
+    const records=parseStudent(name,rows);
+    if(!records.length){app.innerHTML=`<div class="error">❌ "${name}" 학생 데이터를 찾을 수 없습니다.</div>`;return;}
+    window._RECORDS=records;
+
+    const header=document.createElement('div');
+    const totalCard=document.createElement('div');
+    const officialBanner=document.createElement('div');
+    const acadCard=document.createElement('div');
+    const tabWrap=document.createElement('div');tabWrap.className='tabs';
+    tabWrap.innerHTML=`<button class="tab-btn active" id="tab-chart" onclick="showTab('chart')">📈 차트</button><button class="tab-btn" id="tab-table" onclick="showTab('table')">📋 기록표</button>`;
+    const chartContent=document.createElement('div');chartContent.id='content-chart';
+    const tableContent=document.createElement('div');tableContent.id='content-table';tableContent.style.display='none';
+
+    renderHeader(records,header);
+    renderTotalCard(records,totalCard);
+    renderOfficialBanner(records,officialBanner);
+    renderAcadCard(records,acadCard);
+    renderChartTab(records,chartContent);
+    renderTableTab(records,tableContent);
+
+    app.innerHTML='';
+    [header,totalCard,officialBanner,acadCard,tabWrap,chartContent,tableContent].forEach(el=>app.appendChild(el));
+
+    window.showTab=function(tab){
+      document.getElementById('content-chart').style.display=tab==='chart'?'':'none';
+      document.getElementById('content-table').style.display=tab==='table'?'':'none';
+      document.getElementById('tab-chart').classList.toggle('active',tab==='chart');
+      document.getElementById('tab-table').classList.toggle('active',tab==='table');
+    };
+  }catch(err){
+    app.innerHTML=`<div class="error">❌ 데이터 로드 실패: ${err.message}</div>`;
+  }
+})();
 </script>
 </body>
 </html>
