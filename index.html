@@ -50,7 +50,7 @@ body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:var(
 .official-total-label{font-size:.78rem;color:var(--sub);font-weight:600;}
 .official-total-val{font-size:1.2rem;font-weight:900;color:var(--primary-dark);}
 .tabs{display:flex;gap:6px;margin:0 16px 14px;}
-.tab-btn{flex:1;padding:10px 0;border:2px solid var(--primary);border-radius:12px;background:transparent;color:var(--primary);font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;}
+.tab-btn{flex:1;padding:10px 0;border:2px solid var(--primary);border-radius:12px;background:transparent;color:var(--primary);font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;white-space:nowrap;}
 .tab-btn.active{background:var(--primary);color:#fff;box-shadow:0 3px 10px rgba(226,116,34,.3);}
 .content-area{padding:0 16px;}
 .event-card{background:var(--card);border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);margin-bottom:14px;overflow:hidden;border:1px solid var(--border);}
@@ -103,6 +103,29 @@ body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:var(
 .calc-reset:active{background:var(--primary);color:#fff;}
 .calc-ref{margin-top:14px;padding:12px;background:#FAF6F0;border-radius:10px;font-size:.72rem;color:var(--sub);line-height:1.7;}
 .calc-ref strong{color:var(--text);}
+/* ── 영상 탭 ── */
+.video-timeline{position:relative;padding-left:22px;}
+.video-timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--border);}
+.video-item{position:relative;margin-bottom:20px;}
+.video-item::before{content:'';position:absolute;left:-17px;top:16px;width:12px;height:12px;background:var(--primary);border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 2px var(--primary);}
+.video-item.official::before{background:#f39c12;box-shadow:0 0 0 2px #f39c12;}
+.video-card{background:var(--card);border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.06);border:1px solid var(--border);overflow:hidden;}
+.video-meta{padding:11px 16px;display:flex;justify-content:space-between;align-items:center;background:#FFF9F3;border-bottom:1px solid var(--border);}
+.video-date-badge{font-size:.8rem;font-weight:700;color:var(--primary-dark);}
+.video-type-badge{font-size:.72rem;background:#FFF1DC;color:var(--primary-dark);border-radius:12px;padding:3px 10px;font-weight:600;}
+.video-item.official .video-meta{background:#FFF8EE;}
+.video-item.official .video-type-badge{background:#FFE8A0;color:#7d4e00;}
+.video-heart{font-size:1.3rem;cursor:pointer;user-select:none;transition:transform .15s;line-height:1;}
+.video-heart:active{transform:scale(1.35);}
+.video-embed{width:100%;aspect-ratio:16/9;border:none;display:block;background:#000;}
+.video-placeholder{padding:24px;text-align:center;color:var(--sub);font-size:.85rem;background:#FAF6F0;}
+.video-fav-label{font-size:.7rem;color:#e74c3c;text-align:right;padding:4px 14px;font-weight:700;background:#fff5f5;}
+.fav-section{background:var(--card);border-radius:14px;padding:14px 16px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);border:1px solid var(--border);}
+.fav-title{font-size:.88rem;font-weight:800;color:var(--primary-dark);margin-bottom:10px;}
+.fav-empty{font-size:.8rem;color:var(--sub);text-align:center;padding:8px 0;}
+.fav-mini-item{font-size:.8rem;padding:5px 0;color:var(--primary-dark);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;}
+.fav-mini-item:last-child{border-bottom:none;}
+.video-empty{text-align:center;padding:48px 20px;color:var(--sub);font-size:.9rem;background:var(--card);border-radius:14px;border:1px solid var(--border);}
 </style>
 </head>
 <body>
@@ -110,17 +133,17 @@ body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:var(
 <script>
 var SHEET_ID='1-uvH7koGGIEYXO8mL56xVUbUWXEbNPVuVP3htZ2wQMY';
 var SHEET_TAB='동국대학교체육교육과';
+var VIDEO_TAB='실기영상';
 var LOGO_SRC='images/dongguk.png';
 var CSV_URL='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(SHEET_TAB);
+var VIDEO_URL='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(VIDEO_TAB);
 
-/* 동국대 공식 기준 (선형보간: 최저=50, 만점=100) */
+/* 계산기 전용 선형보간 기준 */
 var REF={
   '남':{strength:{max:220,min:130},flex:{max:30.0,min:11.9},jump:{max:300,min:254},run:{max:7.19,min:9.90}},
   '여':{strength:{max:151,min:60},flex:{max:32.0,min:13.9},jump:{max:250,min:199},run:{max:7.60,min:10.90}}
 };
-/* 파울 시 기본점수 = 50 */
 var FOUL_SCORE=50;
-/* 실기 환산 배율: 원점수 400점 → 700점 */
 var MULTI=1.75;
 
 var EVENTS=[
@@ -131,8 +154,8 @@ var EVENTS=[
 ];
 
 function getScoreKey(k){return k==='strength'?'strScore':k==='flex'?'flexScore':k==='jump'?'jumpScore':'runScore';}
+function getFoulKey(k){return k==='strength'?'strFoul':k==='flex'?'flexFoul':k==='jump'?'jumpFoul':'runFoul';}
 
-/* 값 파싱: F/f → 파울 마킹 */
 function parseVal(raw){
   if(raw===undefined||raw===null)return{v:null,foul:false};
   var s=String(raw).trim();
@@ -142,7 +165,14 @@ function parseVal(raw){
   return isNaN(n)?{v:null,foul:false}:{v:n,foul:false};
 }
 
-/* 환산점수 계산 (50~100 원점수) */
+function pv(v){
+  if(v===undefined||v===null)return null;
+  var s=String(v).replace(/,/g,'').trim();
+  if(s===''||s.toUpperCase()==='F')return null;
+  var n=parseFloat(s);return isNaN(n)?null:n;
+}
+
+/* 계산기 전용 선형보간 (시트 점수와 무관) */
 function calcRawScore(evKey,val,gender){
   if(val===null)return null;
   var g=gender==='여'?'여':'남';
@@ -180,6 +210,7 @@ function parseCSV(text){
   return rows;
 }
 
+/* ★ 핵심 수정: 시트 환산점수(9,11,13,15열) 직접 읽기 */
 function parseStudent(name,rows){
   var records=[];
   for(var i=1;i<rows.length;i++){
@@ -188,25 +219,21 @@ function parseStudent(name,rows){
     var gender=(r[3]||'').trim();
     var gKey=(gender==='여'||gender==='여자')?'여':'남';
 
-    /* 원값 파싱 (F/f 파울 처리) */
     var str=parseVal(r[8]),flex=parseVal(r[10]),jump=parseVal(r[12]),run=parseVal(r[14]);
 
-    /* 환산점수: 시트값 우선, 파울이면 기본점수(50), 없으면 계산 */
-    var strScore=str.foul?FOUL_SCORE:(pv(r[9])!==null?pv(r[9]):calcRawScore('strength',str.v,gKey));
-    var flexScore=flex.foul?FOUL_SCORE:(pv(r[11])!==null?pv(r[11]):calcRawScore('flex',flex.v,gKey));
-    var jumpScore=jump.foul?FOUL_SCORE:(pv(r[13])!==null?pv(r[13]):calcRawScore('jump',jump.v,gKey));
-    var runRaw=run.v,runScoreRaw=pv(r[15]);
-    var runScore=run.foul?FOUL_SCORE:(runRaw===null&&runScoreRaw===0?null:(runScoreRaw!==null?runScoreRaw:calcRawScore('run',runRaw,gKey)));
+    /* 환산점수: 시트 값 직접 사용 (파울이면 FOUL_SCORE=50) */
+    var strScore=str.foul?FOUL_SCORE:pv(r[9]);
+    var flexScore=flex.foul?FOUL_SCORE:pv(r[11]);
+    var jumpScore=jump.foul?FOUL_SCORE:pv(r[13]);
+    var runScore=run.foul?FOUL_SCORE:(run.v===null&&pv(r[15])===0?null:pv(r[15]));
 
-    /* 총점: 내신 + (4종목 원점수 합) × 1.75 */
     var acad=pv(r[7]);
     var totVal=pv(r[16]);
     var total=totVal;
     if(total===null){
       var sc=[strScore,flexScore,jumpScore,runScore];
       if(sc.every(function(v){return v!==null;})){
-        var sum=sc.reduce(function(a,b){return a+b;},0);
-        total=Math.round(((acad||0)+sum*MULTI)*100)/100;
+        total=Math.round(((acad||0)+sc.reduce(function(a,b){return a+b;},0))*100)/100;
       }
     }
 
@@ -218,7 +245,7 @@ function parseStudent(name,rows){
       strength:str.v,strFoul:str.foul,strScore:strScore,
       flex:flex.v,flexFoul:flex.foul,flexScore:flexScore,
       jump:jump.v,jumpFoul:jump.foul,jumpScore:jumpScore,
-      run:runRaw,runFoul:run.foul,runScore:runScore,
+      run:run.v,runFoul:run.foul,runScore:runScore,
       total:total
     });
   }
@@ -226,16 +253,38 @@ function parseStudent(name,rows){
   return records;
 }
 
-function pv(v){if(v===undefined||v===null)return null;var s=String(v).replace(/,/g,'').trim();if(s===''||s.toUpperCase()==='F')return null;var n=parseFloat(s);return isNaN(n)?null:n;}
+/* ★ 추가: 영상 시트 파싱 */
+function parseVideos(name,univName,rows){
+  var videos=[];
+  for(var i=1;i<rows.length;i++){
+    var r=rows[i];if(!r||r.length<7)continue;
+    if((r[2]||'').trim()!==name)continue;
+    if(univName&&(r[0]||'').trim()!==univName)continue;
+    var url=(r[6]||'').trim();if(!url)continue;
+    videos.push({univ:(r[0]||'').trim(),dept:(r[1]||'').trim(),name:(r[2]||'').trim(),
+      school:(r[3]||'').trim(),date:(r[4]||'').trim(),type:(r[5]||'').trim(),url:url});
+  }
+  videos.sort(function(a,b){return normalizeDate(a.date)<normalizeDate(b.date)?-1:1;});
+  return videos;
+}
 
-function getFoulKey(k){return k==='strength'?'strFoul':k==='flex'?'flexFoul':k==='jump'?'jumpFoul':'runFoul';}
+/* ★ 추가: Google Drive / YouTube 임베드 변환 */
+function toEmbedUrl(url){
+  if(!url)return null;
+  var yt=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
+  if(yt)return'https://www.youtube.com/embed/'+yt[1];
+  var dr=url.match(/\/file\/d\/([^\/\?]+)/);
+  if(dr)return'https://drive.google.com/file/d/'+dr[1]+'/preview';
+  return null;
+}
+
 function rawDisplay(r,evKey,unit){
   var fk=getFoulKey(evKey);
-  if(r[fk])return '<span class="foul-tag">FOUL</span>';
+  if(r[fk])return'<span class="foul-tag">FOUL</span>';
   return r[evKey]!==null?r[evKey]+' '+unit:'<span class="missing">미측정</span>';
 }
 
-/* ── Hero ── */
+/* ── Hero (원본 그대로) ── */
 function renderHero(records,el){
   var r=records[0];if(!r){el.innerHTML='';return;}
   var off=records.filter(function(x){return isOfficial(x.type);});
@@ -263,7 +312,7 @@ function renderHero(records,el){
     '</div></div>';
 }
 
-/* ── Official Card ── */
+/* ── Official Card (원본 그대로) ── */
 function renderOfficialCard(records,el){
   var offList=records.filter(function(x){return isOfficial(x.type);});
   if(!offList.length){el.innerHTML='';return;}
@@ -291,7 +340,7 @@ function renderOfficialCard(records,el){
     '</div></div></div>';
 }
 
-/* ── Chart Tab ── */
+/* ── Chart Tab (원본 그대로) ── */
 var _charts={};
 function renderChartTab(records,el){
   el.innerHTML='';
@@ -344,7 +393,7 @@ function buildProgress(ev,records){
     var barClass=isOff?'progress-bar-inner official-bar':'progress-bar-inner';
     var tag=isOff?' ⭐':'';
     var valText=foul?'FOUL':r[ev.key];
-    return '<div class="progress-row"><span class="progress-date" style="'+bold+'">'+r.date+tag+'</span>'+
+    return'<div class="progress-row"><span class="progress-date" style="'+bold+'">'+r.date+tag+'</span>'+
       '<div class="progress-bar-outer"><div class="'+barClass+'" style="width:'+pct+'%"></div></div>'+
       '<span class="progress-val" style="'+bold+(foul?';color:#e74c3c':'')+'">'+valText+'</span></div>';
   }).join('');
@@ -354,7 +403,7 @@ function buildDetailTable(ev,records){
   var sk=getScoreKey(ev.key);var sorted=descSort(records);
   el.innerHTML='<table class="detail-table"><thead><tr><th>날짜</th><th>구분</th><th>'+ev.label+'</th><th>원점수</th></tr></thead><tbody>'+
     sorted.map(function(r){var sc=r[sk];
-      return '<tr class="'+(isOfficial(r.type)?'official':'')+'"><td>'+r.date+'</td><td>'+r.type+'</td>'+
+      return'<tr class="'+(isOfficial(r.type)?'official':'')+'"><td>'+r.date+'</td><td>'+r.type+'</td>'+
         '<td>'+rawDisplay(r,ev.key,ev.unit)+'</td>'+
         '<td>'+(sc!==null?sc.toFixed(2):'<span class="missing">—</span>')+'</td></tr>';
     }).join('')+'</tbody></table>';
@@ -363,13 +412,13 @@ function switchChartType(key,type,e){e.stopPropagation();var ev;for(var i=0;i<EV
 function toggleCard(key){var b=document.getElementById('body-'+key);if(b)b.style.display=b.style.display==='none'?'':'none';}
 function toggleDetail(key){var el=document.getElementById('detail-'+key);if(el)el.style.display=el.style.display==='none'?'':'none';}
 
-/* ── Table Tab ── */
+/* ── Table Tab (원본 그대로) ── */
 function renderTableTab(records,el){
   var sorted=descSort(records);
   el.innerHTML='<div class="record-wrap"><table class="record-table"><thead><tr>'+
     '<th>날짜</th><th>구분</th><th>배근력</th><th>원점수</th><th>좌전굴</th><th>원점수</th><th>멀리뛰기</th><th>원점수</th><th>달리기</th><th>원점수</th><th>내신</th><th>총점</th>'+
     '</tr></thead><tbody>'+sorted.map(function(r){
-      return '<tr class="'+(isOfficial(r.type)?'official':'')+'">'+
+      return'<tr class="'+(isOfficial(r.type)?'official':'')+'">'+
         '<td>'+r.date+'</td><td>'+r.type+'</td>'+
         '<td>'+rawDisplay(r,'strength','kg')+'</td><td>'+fmt(r.strScore)+'</td>'+
         '<td>'+rawDisplay(r,'flex','cm')+'</td><td>'+fmt(r.flexScore)+'</td>'+
@@ -380,7 +429,7 @@ function renderTableTab(records,el){
     }).join('')+'</tbody></table></div>';
 }
 
-/* ── Calculator ── */
+/* ── Calculator (원본 그대로) ── */
 var _calcGender='남',_calcInited=false;
 function renderCalcTab(records,el){
   var r=records[0];_calcGender=(r&&r.gender==='여')?'여':'남';
@@ -444,17 +493,102 @@ function updateCalc(){
 }
 function resetCalc(){['calc-str','calc-flex','calc-jump','calc-run'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});updateCalc();}
 
-/* ── Tab ── */
-function showTab(tab){
-  document.getElementById('content-chart').style.display=tab==='chart'?'':'none';
-  document.getElementById('content-table').style.display=tab==='table'?'':'none';
-  document.getElementById('content-calc').style.display=tab==='calc'?'':'none';
-  document.getElementById('tab-chart').classList.toggle('active',tab==='chart');
-  document.getElementById('tab-table').classList.toggle('active',tab==='table');
-  document.getElementById('tab-calc').classList.toggle('active',tab==='calc');
+/* ★ 추가: 영상 탭 렌더링 */
+function getFavKey(name){return'fav_dongguk_'+name;}
+function getFavs(name){try{return JSON.parse(localStorage.getItem(getFavKey(name))||'[]');}catch(e){return[];}}
+function saveFavs(name,favs){localStorage.setItem(getFavKey(name),JSON.stringify(favs));}
+function toggleFav(name,date,type){
+  var favs=getFavs(name);var id=date+'__'+type;
+  var idx=favs.indexOf(id);if(idx===-1)favs.push(id);else favs.splice(idx,1);
+  saveFavs(name,favs);return idx===-1;
 }
 
-/* ── Main ── */
+function renderFavSection(name,videos,container){
+  var favs=getFavs(name);
+  var favVids=videos.filter(function(v){return favs.indexOf(v.date+'__'+v.type)!==-1;});
+  container.innerHTML='';
+  var sec=document.createElement('div');sec.className='fav-section';
+  if(favVids.length){
+    sec.innerHTML='<div class="fav-title">❤️ 즐겨찾기 ('+favVids.length+'개)</div>';
+    favVids.forEach(function(v){
+      var d=document.createElement('div');d.className='fav-mini-item';
+      d.textContent='📅 '+v.date+' · '+v.type;sec.appendChild(d);
+    });
+  }else{
+    sec.innerHTML='<div class="fav-title">❤️ 즐겨찾기</div><div class="fav-empty">하트를 눌러 최고 영상을 저장해보세요!</div>';
+  }
+  container.appendChild(sec);
+}
+
+function renderVideoTab(videos,name,el){
+  el.innerHTML='';
+  var favContainer=document.createElement('div');
+  el.appendChild(favContainer);
+  renderFavSection(name,videos,favContainer);
+
+  if(!videos.length){
+    var empty=document.createElement('div');empty.className='video-empty';
+    empty.innerHTML='📹 아직 등록된 영상이 없어요<br><small style="color:var(--sub);margin-top:6px;display:block;">실기영상 시트에 링크를 추가해주세요</small>';
+    el.appendChild(empty);return;
+  }
+
+  var tl=document.createElement('div');tl.className='video-timeline';
+  videos.forEach(function(v){
+    var embedUrl=toEmbedUrl(v.url);
+    var favs=getFavs(name);
+    var isFav=favs.indexOf(v.date+'__'+v.type)!==-1;
+    var item=document.createElement('div');
+    item.className='video-item'+(isOfficial(v.type)?' official':'');
+    var safeDate=v.date.replace(/'/g,"\\'"),safeType=v.type.replace(/'/g,"\\'"),safeName=name.replace(/'/g,"\\'");
+    item.innerHTML=
+      '<div class="video-card">'+
+      '<div class="video-meta">'+
+        '<span class="video-date-badge">📅 '+v.date+'</span>'+
+        '<span class="video-type-badge">'+(isOfficial(v.type)?'🏆 ':'')+v.type+'</span>'+
+        '<span class="video-heart" onclick="handleHeart(\''+safeName+'\',\''+safeDate+'\',\''+safeType+'\',this,event)">'+(isFav?'❤️':'🤍')+'</span>'+
+      '</div>'+
+      (isFav?'<div class="video-fav-label">❤️ 즐겨찾기 영상</div>':'')+
+      (embedUrl
+        ?'<iframe class="video-embed" src="'+embedUrl+'" allowfullscreen allow="autoplay; encrypted-media"></iframe>'
+        :'<div class="video-placeholder">📹 영상을 불러올 수 없어요<br><a href="'+v.url+'" target="_blank" style="color:var(--primary);font-weight:600;margin-top:6px;display:inline-block;">직접 열기 →</a></div>')+
+      '</div>';
+    tl.appendChild(item);
+  });
+  el.appendChild(tl);
+}
+
+function handleHeart(name,date,type,heartEl,e){
+  if(e)e.stopPropagation();
+  var added=toggleFav(name,date,type);
+  heartEl.textContent=added?'❤️':'🤍';
+  var item=heartEl.closest('.video-item');
+  if(item){
+    var existing=item.querySelector('.video-fav-label');
+    if(added&&!existing){
+      var lbl=document.createElement('div');lbl.className='video-fav-label';lbl.textContent='❤️ 즐겨찾기 영상';
+      var after=item.querySelector('.video-embed,.video-placeholder');
+      if(after)item.querySelector('.video-card').insertBefore(lbl,after);
+    }else if(!added&&existing)existing.remove();
+  }
+  var favContainer=el.querySelector?el.querySelector('.fav-section'):null;
+  var videoContent=document.getElementById('content-video');
+  if(videoContent){
+    var fc=videoContent.firstChild;
+    if(fc)renderFavSection(name,window._VIDEOS||[],fc);
+  }
+}
+
+/* ── Tab 전환 ── */
+function showTab(tab){
+  ['chart','table','calc','video'].forEach(function(t){
+    var c=document.getElementById('content-'+t);
+    var b=document.getElementById('tab-'+t);
+    if(c)c.style.display=tab===t?'':'none';
+    if(b)b.classList.toggle('active',tab===t);
+  });
+}
+
+/* ── 메인 ── */
 (async function(){
   var app=document.getElementById('app');
   var name=new URLSearchParams(location.search).get('name')||'';
@@ -462,19 +596,43 @@ function showTab(tab){
   try{
     var res=await fetch(CSV_URL);if(!res.ok)throw new Error('HTTP '+res.status);
     var text=await res.text();
-    if(text.trim().charAt(0)!=='"'&&text.indexOf('구분')===-1)throw new Error('시트 공유 설정을 확인해주세요.');
-    var rows=parseCSV(text);var records=parseStudent(name,rows);
+    var rows=parseCSV(text);
+    var records=parseStudent(name,rows);
     if(!records.length){app.innerHTML='<div class="error">❌ "'+name+'" 학생 데이터를 찾을 수 없습니다.</div>';return;}
     window._RECORDS=records;
-    app.innerHTML='';
-    var hero=document.createElement('div'),offCard=document.createElement('div');
+
+    /* 영상 시트 로드 */
+    var videos=[];
+    try{
+      var vres=await fetch(VIDEO_URL);
+      if(vres.ok){var vt=await vres.text();videos=parseVideos(name,'동국대학교',parseCSV(vt));}
+    }catch(ve){console.warn('영상 로드 실패:',ve);}
+    window._VIDEOS=videos;
+
+    /* DOM 구성 */
+    var heroEl=document.createElement('div');
+    var offEl=document.createElement('div');
     var tabWrap=document.createElement('div');tabWrap.className='tabs';
-    tabWrap.innerHTML='<button class="tab-btn active" id="tab-chart" onclick="showTab(\'chart\')">📈 차트</button><button class="tab-btn" id="tab-table" onclick="showTab(\'table\')">📋 기록표</button><button class="tab-btn" id="tab-calc" onclick="showTab(\'calc\')">🧮 계산기</button>';
-    var cc=document.createElement('div');cc.id='content-chart';cc.className='content-area';
-    var tc=document.createElement('div');tc.id='content-table';tc.className='content-area';tc.style.display='none';
-    var calc=document.createElement('div');calc.id='content-calc';calc.className='content-area';calc.style.display='none';
-    app.appendChild(hero);app.appendChild(offCard);app.appendChild(tabWrap);app.appendChild(cc);app.appendChild(tc);app.appendChild(calc);
-    renderHero(records,hero);renderOfficialCard(records,offCard);renderChartTab(records,cc);renderTableTab(records,tc);renderCalcTab(records,calc);
+    tabWrap.innerHTML=
+      '<button class="tab-btn active" id="tab-chart" onclick="showTab(\'chart\')">📈 차트</button>'+
+      '<button class="tab-btn" id="tab-table" onclick="showTab(\'table\')">📋 기록표</button>'+
+      '<button class="tab-btn" id="tab-calc" onclick="showTab(\'calc\')">🧮 계산기</button>'+
+      '<button class="tab-btn" id="tab-video" onclick="showTab(\'video\')">🎬 영상</button>';
+
+    var chartEl=document.createElement('div');chartEl.id='content-chart';chartEl.className='content-area';
+    var tableEl=document.createElement('div');tableEl.id='content-table';tableEl.className='content-area';tableEl.style.display='none';
+    var calcEl=document.createElement('div');calcEl.id='content-calc';calcEl.className='content-area';calcEl.style.display='none';
+    var videoEl=document.createElement('div');videoEl.id='content-video';videoEl.className='content-area';videoEl.style.display='none';
+
+    renderHero(records,heroEl);
+    renderOfficialCard(records,offEl);
+    renderChartTab(records,chartEl);
+    renderTableTab(records,tableEl);
+    renderCalcTab(records,calcEl);
+    renderVideoTab(videos,name,videoEl);
+
+    app.innerHTML='';
+    [heroEl,offEl,tabWrap,chartEl,tableEl,calcEl,videoEl].forEach(function(e){app.appendChild(e);});
   }catch(err){app.innerHTML='<div class="error">❌ 로드 실패: '+err.message+'</div>';}
 })();
 </script>
