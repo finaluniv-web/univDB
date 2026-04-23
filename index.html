@@ -103,7 +103,6 @@ body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:var(
 .calc-reset:active{background:var(--primary);color:#fff;}
 .calc-ref{margin-top:14px;padding:12px;background:#FAF6F0;border-radius:10px;font-size:.72rem;color:var(--sub);line-height:1.7;}
 .calc-ref strong{color:var(--text);}
-/* ── 영상 탭 ── */
 .video-timeline{position:relative;padding-left:22px;}
 .video-timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--border);}
 .video-item{position:relative;margin-bottom:20px;}
@@ -118,7 +117,6 @@ body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:var(
 .video-heart{font-size:1.3rem;cursor:pointer;user-select:none;transition:transform .15s;line-height:1;}
 .video-heart:active{transform:scale(1.35);}
 .video-fav-label{font-size:.7rem;color:#e74c3c;text-align:right;padding:4px 14px;font-weight:700;background:#fff5f5;}
-/* YouTube 썸네일 */
 .video-thumb-wrap{position:relative;width:100%;aspect-ratio:16/9;background:#111;overflow:hidden;cursor:pointer;}
 .video-thumb-wrap img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity .2s;}
 .video-thumb-wrap:active img{opacity:.85;}
@@ -126,19 +124,16 @@ body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:var(
 .video-play-btn{width:60px;height:60px;background:rgba(255,255,255,.92);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.3);margin-bottom:8px;}
 .video-play-btn svg{width:26px;height:26px;fill:var(--primary-dark);margin-left:4px;}
 .video-open-label{color:#fff;font-size:.78rem;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.5);letter-spacing:.3px;}
-/* Drive 세로영상 최적화 */
 .video-portrait-wrap{width:100%;background:#000;display:flex;justify-content:center;align-items:center;cursor:pointer;position:relative;overflow:hidden;min-height:300px;}
 .video-portrait-wrap:active{opacity:.88;}
 .video-portrait-inner{height:320px;aspect-ratio:9/16;background:#111;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
 .video-portrait-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.35);}
 .video-portrait-side{flex:1;background:#000;}
-/* Drive 가로/기타 */
 .video-drive-thumb{width:100%;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:opacity .2s;padding:32px 0;}
 .video-drive-thumb:active{opacity:.85;}
 .video-drive-icon{font-size:3rem;margin-bottom:10px;}
 .video-drive-label{color:#fff;font-size:.85rem;font-weight:700;margin-bottom:4px;}
 .video-drive-sub{color:rgba(255,255,255,.6);font-size:.73rem;}
-/* 즐겨찾기 */
 .fav-section{background:var(--card);border-radius:14px;padding:14px 16px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);border:1px solid var(--border);}
 .fav-title{font-size:.88rem;font-weight:800;color:var(--primary-dark);margin-bottom:10px;}
 .fav-empty{font-size:.8rem;color:var(--sub);text-align:center;padding:8px 0;}
@@ -156,6 +151,12 @@ var VIDEO_TAB='실기영상';
 var LOGO_SRC='images/dongguk.png';
 var CSV_URL='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(SHEET_TAB);
 var VIDEO_URL='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(VIDEO_TAB);
+
+/* ── URL 파라미터 ── */
+var params=new URLSearchParams(location.search);
+var name=params.get('name')||'';
+var school=params.get('school')||'';
+var type=params.get('type')||'';
 
 var REF={
   '남':{strength:{max:220,min:130},flex:{max:30.0,min:11.9},jump:{max:300,min:254},run:{max:7.19,min:9.90}},
@@ -224,20 +225,26 @@ function parseCSV(text){
   return rows;
 }
 
-function parseStudent(name,rows){
+/* ── 열 인덱스 (전형 열 추가 → 9열 고정) ── */
+/* 0:구분 1:전형 2:날짜 3:이름 4:성별 5:학교 6:대학명 7:학과명 8:환산점수 */
+/* 9:배근력 10:환산점수 11:좌전굴 12:환산점수 13:제자리멀리뛰기 14:환산점수 15:중량달리기 16:환산점수 17:총점 */
+
+function parseStudent(name,school,type,rows){
   var records=[];
   for(var i=1;i<rows.length;i++){
-    var r=rows[i];if(!r||r.length<13)continue;
-    if((r[2]||'').trim()!==name)continue;
-    var gender=(r[3]||'').trim();
+    var r=rows[i];if(!r||r.length<14)continue;
+    if((r[3]||'').trim()!==name)continue;
+    if(school&&(r[5]||'').trim()!==school)continue;
+    if(type&&(r[1]||'').trim()!==type)continue;
+    var gender=(r[4]||'').trim();
     var gKey=(gender==='여'||gender==='여자')?'여':'남';
-    var str=parseVal(r[8]),flex=parseVal(r[10]),jump=parseVal(r[12]),run=parseVal(r[14]);
-    var strScore=str.foul?FOUL_SCORE:pv(r[9]);
-    var flexScore=flex.foul?FOUL_SCORE:pv(r[11]);
-    var jumpScore=jump.foul?FOUL_SCORE:pv(r[13]);
-    var runScore=run.foul?FOUL_SCORE:(run.v===null&&pv(r[15])===0?null:pv(r[15]));
-    var acad=pv(r[7]);
-    var totVal=pv(r[16]);
+    var str=parseVal(r[9]),flex=parseVal(r[11]),jump=parseVal(r[13]),run=parseVal(r[15]);
+    var strScore=str.foul?FOUL_SCORE:pv(r[10]);
+    var flexScore=flex.foul?FOUL_SCORE:pv(r[12]);
+    var jumpScore=jump.foul?FOUL_SCORE:pv(r[14]);
+    var runScore=run.foul?FOUL_SCORE:(run.v===null&&pv(r[16])===0?null:pv(r[16]));
+    var acad=pv(r[8]);
+    var totVal=pv(r[17]);
     var total=totVal;
     if(total===null){
       var sc=[strScore,flexScore,jumpScore,runScore];
@@ -246,9 +253,9 @@ function parseStudent(name,rows){
       }
     }
     records.push({
-      type:(r[0]||'').trim(),date:(r[1]||'').trim(),
-      name:(r[2]||'').trim(),gender:gKey,
-      school:(r[4]||'').trim(),univ:(r[5]||'').trim(),dept:(r[6]||'').trim(),
+      type:(r[0]||'').trim(),admType:(r[1]||'').trim(),date:(r[2]||'').trim(),
+      name:(r[3]||'').trim(),gender:gKey,
+      school:(r[5]||'').trim(),univ:(r[6]||'').trim(),dept:(r[7]||'').trim(),
       acad:acad,
       strength:str.v,strFoul:str.foul,strScore:strScore,
       flex:flex.v,flexFoul:flex.foul,flexScore:flexScore,
@@ -261,11 +268,12 @@ function parseStudent(name,rows){
   return records;
 }
 
-function parseVideos(name,univName,rows){
+function parseVideos(name,school,univName,rows){
   var videos=[];
   for(var i=1;i<rows.length;i++){
     var r=rows[i];if(!r||r.length<7)continue;
     if((r[2]||'').trim()!==name)continue;
+    if(school&&(r[3]||'').trim()!==school)continue;
     if(univName&&(r[0]||'').trim()!==univName)continue;
     var url=(r[6]||'').trim();if(!url)continue;
     videos.push({univ:(r[0]||'').trim(),dept:(r[1]||'').trim(),name:(r[2]||'').trim(),
@@ -303,11 +311,12 @@ function renderHero(records,el){
   var total=last.total;
   if(total===null&&allHave)total=Math.round((acad+sum*MULTI)*100)/100;
   var gCls=r.gender==='여'?'gender-f':'gender-m';
+  var admLabel=r.admType?' · '+r.admType:'';
   el.innerHTML=
     '<div class="hero"><div class="hero-top">'+
     '<img class="hero-logo" src="'+LOGO_SRC+'" alt="동국대" onerror="this.style.display=\'none\'">'+
     '<div class="hero-info"><h1>'+r.name+'<span class="gender-badge '+gCls+'">'+r.gender+'</span></h1>'+
-    '<p>'+r.school+' · '+r.univ+' '+r.dept+'</p>'+
+    '<p>'+r.school+' · '+r.univ+' '+r.dept+admLabel+'</p>'+
     '<p class="cnt">총 '+records.length+'회 기록</p></div></div>'+
     '<div class="hero-divider"></div>'+
     '<div class="hero-score-area">'+
@@ -423,10 +432,10 @@ function toggleDetail(key){var el=document.getElementById('detail-'+key);if(el)e
 function renderTableTab(records,el){
   var sorted=descSort(records);
   el.innerHTML='<div class="record-wrap"><table class="record-table"><thead><tr>'+
-    '<th>날짜</th><th>구분</th><th>배근력</th><th>원점수</th><th>좌전굴</th><th>원점수</th><th>멀리뛰기</th><th>원점수</th><th>달리기</th><th>원점수</th><th>내신</th><th>총점</th>'+
+    '<th>날짜</th><th>구분</th><th>전형</th><th>배근력</th><th>원점수</th><th>좌전굴</th><th>원점수</th><th>멀리뛰기</th><th>원점수</th><th>달리기</th><th>원점수</th><th>내신</th><th>총점</th>'+
     '</tr></thead><tbody>'+sorted.map(function(r){
       return'<tr class="'+(isOfficial(r.type)?'official':'')+'">'+
-        '<td>'+r.date+'</td><td>'+r.type+'</td>'+
+        '<td>'+r.date+'</td><td>'+r.type+'</td><td>'+r.admType+'</td>'+
         '<td>'+rawDisplay(r,'strength','kg')+'</td><td>'+fmt(r.strScore)+'</td>'+
         '<td>'+rawDisplay(r,'flex','cm')+'</td><td>'+fmt(r.flexScore)+'</td>'+
         '<td>'+rawDisplay(r,'jump','cm')+'</td><td>'+fmt(r.jumpScore)+'</td>'+
@@ -449,222 +458,127 @@ function renderCalcTab(records,el){
     '<div class="calc-row"><label>배근력</label><input type="number" id="calc-str" step="0.5" placeholder="kg" oninput="updateCalc()"><span class="calc-unit">kg</span><span class="calc-score" id="calc-str-sc"></span></div>'+
     '<div class="calc-row"><label>좌전굴</label><input type="number" id="calc-flex" step="0.1" placeholder="cm" oninput="updateCalc()"><span class="calc-unit">cm</span><span class="calc-score" id="calc-flex-sc"></span></div>'+
     '<div class="calc-row"><label>멀리뛰기</label><input type="number" id="calc-jump" step="1" placeholder="cm" oninput="updateCalc()"><span class="calc-unit">cm</span><span class="calc-score" id="calc-jump-sc"></span></div>'+
-    '<div class="calc-row"><label>달리기</label><input type="number" id="calc-run" step="0.01" placeholder="초" oninput="updateCalc()"><span class="calc-unit">초</span><span class="calc-score" id="calc-run-sc"></span></div>'+
-    '<div class="calc-result"><div class="calc-result-label">예상 최종 총점 (1000점 만점)</div>'+
-    '<div class="calc-result-score" id="calc-total">—</div>'+
-    '<div class="calc-result-detail" id="calc-detail">종목 기록을 입력해주세요</div></div>'+
+    '<div class="calc-row"><label>중량달리기</label><input type="number" id="calc-run" step="0.01" placeholder="초" oninput="updateCalc()"><span class="calc-unit">초</span><span class="calc-score" id="calc-run-sc"></span></div>'+
+    '<div class="calc-result"><div class="calc-result-label">예상 총점</div><div class="calc-result-score" id="calc-total">—</div><div class="calc-result-detail" id="calc-detail"></div></div>'+
     '<button class="calc-reset" onclick="resetCalc()">초기화</button>'+
-    '<div class="calc-ref" id="calc-ref"></div></div>';
-  _calcInited=true;updateCalcRef();
+    '<div class="calc-ref"><strong>기준표 ('+_calcGender+')</strong><br>'+
+    '배근력: '+REF[_calcGender].strength.min+'~'+REF[_calcGender].strength.max+'kg (50~100점)<br>'+
+    '좌전굴: '+REF[_calcGender].flex.min+'~'+REF[_calcGender].flex.max+'cm (50~100점)<br>'+
+    '멀리뛰기: '+REF[_calcGender].jump.min+'~'+REF[_calcGender].jump.max+'cm (50~100점)<br>'+
+    '중량달리기: '+REF[_calcGender].run.max+'~'+REF[_calcGender].run.min+'초 (100~50점)</div></div>';
 }
-function setCalcGender(g){_calcGender=g;var m=document.getElementById('calc-g-m'),f=document.getElementById('calc-g-f');if(m)m.classList.toggle('active',g==='남');if(f)f.classList.toggle('active',g==='여');updateCalcRef();updateCalc();}
-function updateCalcRef(){
-  var s=REF[_calcGender];var el=document.getElementById('calc-ref');if(!el||!s)return;
-  el.innerHTML='<strong>'+_calcGender+'자 기준 (원점수 50~100점, ×1.75 → 실기700점)</strong><br>'+
-    '배근력: '+s.strength.max+'kg↑=100, '+s.strength.min+'kg↓=50<br>'+
-    '좌전굴: '+s.flex.max+'cm↑=100, '+s.flex.min+'cm↓=50<br>'+
-    '멀리뛰기: '+s.jump.max+'cm↑=100, '+s.jump.min+'cm↓=50<br>'+
-    '달리기: '+s.run.max+'초↓=100, '+s.run.min+'초↑=50<br>'+
-    '<br><strong>파울(F) 시: 해당 종목 기본점수 50점</strong>';
-}
+function setCalcGender(g){_calcGender=g;document.getElementById('calc-g-m').className=g==='남'?'active':'';document.getElementById('calc-g-f').className=g==='여'?'active':'';updateCalc();var ref=document.querySelector('.calc-ref');if(ref)ref.innerHTML='<strong>기준표 ('+g+')</strong><br>배근력: '+REF[g].strength.min+'~'+REF[g].strength.max+'kg (50~100점)<br>좌전굴: '+REF[g].flex.min+'~'+REF[g].flex.max+'cm (50~100점)<br>멀리뛰기: '+REF[g].jump.min+'~'+REF[g].jump.max+'cm (50~100점)<br>중량달리기: '+REF[g].run.max+'~'+REF[g].run.min+'초 (100~50점)';}
 function updateCalc(){
-  if(!_calcInited)return;
-  var acadEl=document.getElementById('calc-acad'),strEl=document.getElementById('calc-str'),flexEl=document.getElementById('calc-flex'),jumpEl=document.getElementById('calc-jump'),runEl=document.getElementById('calc-run');
-  if(!acadEl||!strEl||!flexEl||!jumpEl||!runEl)return;
-  var acad=parseFloat(acadEl.value)||0;
-  var strV=parseFloat(strEl.value),flexV=parseFloat(flexEl.value),jumpV=parseFloat(jumpEl.value),runV=parseFloat(runEl.value);
+  var acad=parseFloat(document.getElementById('calc-acad').value)||0;
+  var strV=parseFloat(document.getElementById('calc-str').value),flexV=parseFloat(document.getElementById('calc-flex').value),jumpV=parseFloat(document.getElementById('calc-jump').value),runV=parseFloat(document.getElementById('calc-run').value);
   var strSc=isNaN(strV)?null:calcRawScore('strength',strV,_calcGender);
   var flexSc=isNaN(flexV)?null:calcRawScore('flex',flexV,_calcGender);
   var jumpSc=isNaN(jumpV)?null:calcRawScore('jump',jumpV,_calcGender);
   var runSc=isNaN(runV)?null:calcRawScore('run',runV,_calcGender);
-  var e;
-  e=document.getElementById('calc-acad-sc');if(e)e.textContent=acad?acad.toFixed(2)+'점':'';
-  e=document.getElementById('calc-str-sc');if(e)e.textContent=strSc!==null?strSc.toFixed(2)+' → '+(strSc*MULTI).toFixed(2):'';
-  e=document.getElementById('calc-flex-sc');if(e)e.textContent=flexSc!==null?flexSc.toFixed(2)+' → '+(flexSc*MULTI).toFixed(2):'';
-  e=document.getElementById('calc-jump-sc');if(e)e.textContent=jumpSc!==null?jumpSc.toFixed(2)+' → '+(jumpSc*MULTI).toFixed(2):'';
-  e=document.getElementById('calc-run-sc');if(e)e.textContent=runSc!==null?runSc.toFixed(2)+' → '+(runSc*MULTI).toFixed(2):'';
+  document.getElementById('calc-str-sc').textContent=strSc!==null?strSc.toFixed(2)+'점':'';
+  document.getElementById('calc-flex-sc').textContent=flexSc!==null?flexSc.toFixed(2)+'점':'';
+  document.getElementById('calc-jump-sc').textContent=jumpSc!==null?jumpSc.toFixed(2)+'점':'';
+  document.getElementById('calc-run-sc').textContent=runSc!==null?runSc.toFixed(2)+'점':'';
   var all=[strSc,flexSc,jumpSc,runSc];
-  var filled=all.filter(function(v){return v!==null;});
-  var totalEl=document.getElementById('calc-total'),detailEl=document.getElementById('calc-detail');
-  if(!totalEl||!detailEl)return;
-  if(filled.length===4){
-    var rawSum=filled.reduce(function(a,b){return a+b;},0);
-    var realSum=Math.round(rawSum*MULTI*100)/100;
-    var total=Math.round((acad+realSum)*100)/100;
-    totalEl.textContent=total.toFixed(2)+'점';
-    detailEl.innerHTML='내신 '+acad.toFixed(2)+' + 실기원점수 '+rawSum.toFixed(2)+' × 1.75 = 실기 '+realSum.toFixed(2)+'<br>총점: '+acad.toFixed(2)+' + '+realSum.toFixed(2)+' = <strong>'+total.toFixed(2)+'</strong>';
-  }else{
-    totalEl.textContent=filled.length>0?'입력 '+filled.length+'/4':'—';
-    detailEl.textContent=filled.length>0?'모든 종목을 입력하면 총점이 계산됩니다':'종목 기록을 입력해주세요';
-  }
+  if(all.every(function(v){return v!==null;})){
+    var sum=all.reduce(function(a,b){return a+b;},0);
+    var total=acad+sum*MULTI;
+    document.getElementById('calc-total').textContent=total.toFixed(2);
+    document.getElementById('calc-detail').innerHTML='내신 '+acad.toFixed(2)+' + 실기원점수 '+sum.toFixed(2)+' × 1.75 = '+total.toFixed(2);
+  }else{document.getElementById('calc-total').textContent='—';document.getElementById('calc-detail').textContent='모든 종목을 입력하세요';}
 }
-function resetCalc(){['calc-str','calc-flex','calc-jump','calc-run'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});updateCalc();}
+function resetCalc(){['calc-acad','calc-str','calc-flex','calc-jump','calc-run'].forEach(function(id){document.getElementById(id).value='';});['calc-str-sc','calc-flex-sc','calc-jump-sc','calc-run-sc'].forEach(function(id){document.getElementById(id).textContent='';});document.getElementById('calc-total').textContent='—';document.getElementById('calc-detail').textContent='';}
 
-/* ── 영상 탭 ── */
-function getFavKey(name){return'fav_dongguk_'+name;}
-function getFavs(name){try{return JSON.parse(localStorage.getItem(getFavKey(name))||'[]');}catch(e){return[];}}
-function saveFavs(name,favs){localStorage.setItem(getFavKey(name),JSON.stringify(favs));}
-function toggleFav(name,date,type){
-  var favs=getFavs(name);var id=date+'__'+type;
-  var idx=favs.indexOf(id);if(idx===-1)favs.push(id);else favs.splice(idx,1);
-  saveFavs(name,favs);return idx===-1;
-}
-function renderFavSection(name,videos,container){
-  var favs=getFavs(name);
-  var favVids=videos.filter(function(v){return favs.indexOf(v.date+'__'+v.type)!==-1;});
-  container.innerHTML='';
-  var sec=document.createElement('div');sec.className='fav-section';
-  if(favVids.length){
-    sec.innerHTML='<div class="fav-title">❤️ 즐겨찾기 ('+favVids.length+'개)</div>';
-    favVids.forEach(function(v){
-      var d=document.createElement('div');d.className='fav-mini-item';
-      d.textContent='📅 '+v.date+' · '+v.type;sec.appendChild(d);
-    });
-  }else{
-    sec.innerHTML='<div class="fav-title">❤️ 즐겨찾기</div><div class="fav-empty">하트를 눌러 최고 영상을 저장해보세요!</div>';
+/* ── Video Tab ── */
+function renderVideoTab(videos,el){
+  if(!videos.length){el.innerHTML='<div class="video-empty">📹 등록된 영상이 없습니다.</div>';return;}
+  var favKey='fav_dongguk_'+name;
+  var favs=JSON.parse(localStorage.getItem(favKey)||'[]');
+  var html='';
+  if(favs.length){
+    html+='<div class="fav-section"><div class="fav-title">⭐ 즐겨찾기</div>';
+    var found=false;
+    videos.forEach(function(v,i){if(favs.indexOf(i)!==-1){found=true;html+='<div class="fav-mini-item" onclick="document.getElementById(\'vid-'+i+'\').scrollIntoView({behavior:\'smooth\'})">📌 '+v.date+' '+v.type+'</div>';}});
+    if(!found)html+='<div class="fav-empty">즐겨찾기한 영상이 없습니다.</div>';
+    html+='</div>';
   }
-  container.appendChild(sec);
-}
-
-function renderVideoTab(videos,name,el){
-  el.innerHTML='';
-  var favContainer=document.createElement('div');
-  el.appendChild(favContainer);
-  renderFavSection(name,videos,favContainer);
-  if(!videos.length){
-    var empty=document.createElement('div');empty.className='video-empty';
-    empty.innerHTML='📹 아직 등록된 영상이 없어요<br><small style="color:var(--sub);margin-top:6px;display:block;">실기영상 시트에 링크를 추가해주세요</small>';
-    el.appendChild(empty);return;
-  }
-  var tl=document.createElement('div');tl.className='video-timeline';
-  videos.forEach(function(v){
-    var vInfo=getVideoType(v.url);
-    var favs=getFavs(name);
-    var isFav=favs.indexOf(v.date+'__'+v.type)!==-1;
-    var item=document.createElement('div');
-    item.className='video-item'+(isOfficial(v.type)?' official':'');
-    var safeDate=v.date.replace(/'/g,"\\'");
-    var safeType=v.type.replace(/'/g,"\\'");
-    var safeName=name.replace(/'/g,"\\'");
-    var safeUrl=v.url.replace(/"/g,'&quot;');
-    var mediaHtml='';
-    if(vInfo&&vInfo.type==='youtube'){
-      var thumbUrl=getYtThumb(vInfo.id);
-      mediaHtml=
-        '<div class="video-thumb-wrap" onclick="window.open(\''+safeUrl+'\',\'_blank\')">'+
-        '<img src="'+thumbUrl+'" alt="썸네일" onerror="this.style.display=\'none\'">'+
-        '<div class="video-thumb-overlay">'+
-        '<div class="video-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>'+
-        '<span class="video-open-label">탭하여 YouTube에서 재생</span>'+
-        '</div></div>';
-    }else if(vInfo&&vInfo.type==='drive'){
-      var driveViewUrl='https://drive.google.com/file/d/'+vInfo.id+'/view';
-      mediaHtml=
-        '<div class="video-portrait-wrap" onclick="window.open(\''+driveViewUrl+'\',\'_blank\')">'+
-        '<div class="video-portrait-side"></div>'+
-        '<div class="video-portrait-inner">'+
-        '<div class="video-portrait-overlay">'+
-        '<div class="video-play-btn" style="width:56px;height:56px;margin-bottom:10px;">'+
-        '<svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:#C45E10;margin-left:4px;"><path d="M8 5v14l11-7z"/></svg>'+
-        '</div>'+
-        '<span style="color:#fff;font-size:.8rem;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.6);">탭하여 원본 화질로 재생</span>'+
-        '<span style="color:rgba(255,255,255,.65);font-size:.7rem;margin-top:4px;">Google Drive에서 열기</span>'+
-        '</div></div>'+
-        '<div class="video-portrait-side"></div>'+
-        '</div>';
+  html+='<div class="video-timeline">';
+  videos.forEach(function(v,i){
+    var isFav=favs.indexOf(i)!==-1;
+    var vt=getVideoType(v.url);
+    var isOff=v.type.indexOf('공식')!==-1;
+    html+='<div class="video-item'+(isOff?' official':'')+'" id="vid-'+i+'">';
+    html+='<div class="video-card">';
+    html+='<div class="video-meta"><span class="video-date-badge">'+v.date+'</span><span class="video-type-badge">'+v.type+'</span></div>';
+    if(isFav)html+='<div class="video-fav-label">⭐ 즐겨찾기</div>';
+    if(vt&&vt.type==='youtube'){
+      html+='<div class="video-thumb-wrap" onclick="window.open(\''+v.url+'\',\'_blank\')"><img src="'+getYtThumb(vt.id)+'" alt="thumbnail" onerror="this.src=\'https://img.youtube.com/vi/'+vt.id+'/hqdefault.jpg\'"><div class="video-thumb-overlay"><div class="video-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><span class="video-open-label">YouTube에서 재생</span></div></div>';
+    }else if(vt&&vt.type==='drive'){
+      html+='<div class="video-portrait-wrap" onclick="window.open(\''+v.url+'\',\'_blank\')"><div class="video-portrait-side"></div><div class="video-portrait-inner"><div class="video-portrait-overlay"><div class="video-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><span class="video-open-label">Google Drive에서 재생</span></div></div><div class="video-portrait-side"></div></div>';
     }else{
-      mediaHtml=
-        '<div class="video-drive-thumb" onclick="window.open(\''+safeUrl+'\',\'_blank\')">'+
-        '<div class="video-drive-icon">🎬</div>'+
-        '<div class="video-drive-label">영상 보기</div>'+
-        '<div class="video-drive-sub">탭하여 재생</div>'+
-        '</div>';
+      html+='<div class="video-drive-thumb" onclick="window.open(\''+v.url+'\',\'_blank\')"><div class="video-drive-icon">🎬</div><div class="video-drive-label">영상 보기</div><div class="video-drive-sub">외부 링크에서 재생</div></div>';
     }
-    item.innerHTML=
-      '<div class="video-card">'+
-      '<div class="video-meta">'+
-      '<span class="video-date-badge">📅 '+v.date+'</span>'+
-      '<span class="video-type-badge">'+(isOfficial(v.type)?'🏆 ':'')+v.type+'</span>'+
-      '<span class="video-heart" onclick="handleHeart(\''+safeName+'\',\''+safeDate+'\',\''+safeType+'\',this,event)">'+(isFav?'❤️':'🤍')+'</span>'+
-      '</div>'+
-      (isFav?'<div class="video-fav-label">❤️ 즐겨찾기 영상</div>':'')+
-      mediaHtml+
-      '</div>';
-    tl.appendChild(item);
+    html+='<div style="padding:8px 14px;text-align:right"><span class="video-heart" onclick="toggleFav('+i+')">'+(isFav?'❤️':'🤍')+'</span></div>';
+    html+='</div></div>';
   });
-  el.appendChild(tl);
+  html+='</div>';
+  el.innerHTML=html;
+  window._toggleFavVideos=videos;
+}
+function toggleFav(idx){
+  var favKey='fav_dongguk_'+name;
+  var favs=JSON.parse(localStorage.getItem(favKey)||'[]');
+  var pos=favs.indexOf(idx);
+  if(pos===-1)favs.push(idx);else favs.splice(pos,1);
+  localStorage.setItem(favKey,JSON.stringify(favs));
+  renderVideoTab(window._toggleFavVideos,document.getElementById('content-video'));
 }
 
-function handleHeart(name,date,type,heartEl,e){
-  if(e)e.stopPropagation();
-  var added=toggleFav(name,date,type);
-  heartEl.textContent=added?'❤️':'🤍';
-  var item=heartEl.closest('.video-item');
-  if(item){
-    var existing=item.querySelector('.video-fav-label');
-    if(added&&!existing){
-      var lbl=document.createElement('div');lbl.className='video-fav-label';lbl.textContent='❤️ 즐겨찾기 영상';
-      var after=item.querySelector('.video-thumb-wrap,.video-portrait-wrap,.video-drive-thumb');
-      if(after)item.querySelector('.video-card').insertBefore(lbl,after);
-    }else if(!added&&existing)existing.remove();
-  }
-  var videoContent=document.getElementById('content-video');
-  if(videoContent){
-    var fc=videoContent.firstChild;
-    if(fc)renderFavSection(name,window._VIDEOS||[],fc);
-  }
-}
-
-/* ── Tab 전환 ── */
-function showTab(tab){
-  ['chart','table','calc','video'].forEach(function(t){
-    var c=document.getElementById('content-'+t);
-    var b=document.getElementById('tab-'+t);
-    if(c)c.style.display=tab===t?'':'none';
-    if(b)b.classList.toggle('active',tab===t);
+/* ── Tabs ── */
+function setupTabs(records,videos){
+  var tabs=document.querySelectorAll('.tab-btn');
+  var contents={chart:document.getElementById('content-chart'),table:document.getElementById('content-table'),calc:document.getElementById('content-calc'),video:document.getElementById('content-video')};
+  tabs.forEach(function(btn){
+    btn.addEventListener('click',function(){
+      tabs.forEach(function(b){b.classList.remove('active');});
+      btn.classList.add('active');
+      var t=btn.dataset.tab;
+      Object.keys(contents).forEach(function(k){contents[k].style.display=k===t?'':'none';});
+    });
   });
+  renderChartTab(records,contents.chart);
+  renderTableTab(records,contents.table);
+  renderCalcTab(records,contents.calc);
+  renderVideoTab(videos,contents.video);
 }
 
-/* ── 메인 ── */
-(async function(){
-  var app=document.getElementById('app');
-  var name=new URLSearchParams(location.search).get('name')||'';
-  if(!name){app.innerHTML='<div class="error">❌ URL에 ?name=학생이름 을 추가해주세요.</div>';return;}
-  try{
-    var res=await fetch(CSV_URL);if(!res.ok)throw new Error('HTTP '+res.status);
-    var text=await res.text();
-    var rows=parseCSV(text);
-    var records=parseStudent(name,rows);
-    if(!records.length){app.innerHTML='<div class="error">❌ "'+name+'" 학생 데이터를 찾을 수 없습니다.</div>';return;}
+/* ── Init ── */
+function init(){
+  if(!name){document.getElementById('app').innerHTML='<div class="error">⚠️ URL에 이름이 없습니다.<br>?name=이름 형식으로 접속하세요.</div>';return;}
+  Promise.all([
+    fetch(CSV_URL).then(function(r){return r.text();}),
+    fetch(VIDEO_URL).then(function(r){return r.text();}).catch(function(){return'';})
+  ]).then(function(results){
+    var dataRows=parseCSV(results[0]);
+    var videoRows=results[1]?parseCSV(results[1]):[];
+    var records=parseStudent(name,school,type,dataRows);
+    var videos=parseVideos(name,school,'동국대학교',videoRows);
+    if(!records.length){document.getElementById('app').innerHTML='<div class="error">⚠️ "'+name+'" 학생의 기록을 찾을 수 없습니다.</div>';return;}
     window._RECORDS=records;
-    var videos=[];
-    try{
-      var vres=await fetch(VIDEO_URL);
-      if(vres.ok){var vt=await vres.text();videos=parseVideos(name,'동국대학교',parseCSV(vt));}
-    }catch(ve){console.warn('영상 로드 실패:',ve);}
-    window._VIDEOS=videos;
     var heroEl=document.createElement('div');
     var offEl=document.createElement('div');
-    var tabWrap=document.createElement('div');tabWrap.className='tabs';
-    tabWrap.innerHTML=
-      '<button class="tab-btn active" id="tab-chart" onclick="showTab(\'chart\')">📈 차트</button>'+
-      '<button class="tab-btn" id="tab-table" onclick="showTab(\'table\')">📋 기록표</button>'+
-      '<button class="tab-btn" id="tab-calc" onclick="showTab(\'calc\')">🧮 계산기</button>'+
-      '<button class="tab-btn" id="tab-video" onclick="showTab(\'video\')">🎬 영상</button>';
-    var chartEl=document.createElement('div');chartEl.id='content-chart';chartEl.className='content-area';
-    var tableEl=document.createElement('div');tableEl.id='content-table';tableEl.className='content-area';tableEl.style.display='none';
-    var calcEl=document.createElement('div');calcEl.id='content-calc';calcEl.className='content-area';calcEl.style.display='none';
-    var videoEl=document.createElement('div');videoEl.id='content-video';videoEl.className='content-area';videoEl.style.display='none';
+    var tabsEl=document.createElement('div');tabsEl.className='tabs';
+    tabsEl.innerHTML='<button class="tab-btn active" data-tab="chart">종목별 분석</button><button class="tab-btn" data-tab="table">전체 기록표</button><button class="tab-btn" data-tab="calc">점수 계산기</button><button class="tab-btn" data-tab="video">실기 영상</button>';
+    var contentArea=document.createElement('div');contentArea.className='content-area';
+    contentArea.innerHTML='<div id="content-chart"></div><div id="content-table" style="display:none"></div><div id="content-calc" style="display:none"></div><div id="content-video" style="display:none"></div>';
+    var app=document.getElementById('app');app.innerHTML='';
+    app.appendChild(heroEl);app.appendChild(offEl);app.appendChild(tabsEl);app.appendChild(contentArea);
     renderHero(records,heroEl);
     renderOfficialCard(records,offEl);
-    renderChartTab(records,chartEl);
-    renderTableTab(records,tableEl);
-    renderCalcTab(records,calcEl);
-    renderVideoTab(videos,name,videoEl);
-    app.innerHTML='';
-    [heroEl,offEl,tabWrap,chartEl,tableEl,calcEl,videoEl].forEach(function(e){app.appendChild(e);});
-  }catch(err){app.innerHTML='<div class="error">❌ 로드 실패: '+err.message+'</div>';}
-})();
+    setupTabs(records,videos);
+  }).catch(function(e){console.error(e);document.getElementById('app').innerHTML='<div class="error">⚠️ 데이터를 불러올 수 없습니다.<br>새로고침 해주세요.</div>';});
+}
+init();
 </script>
 </body>
 </html>
