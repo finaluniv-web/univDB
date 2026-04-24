@@ -579,6 +579,21 @@ function init(){
   }).catch(function(e){console.error(e);document.getElementById('app').innerHTML='<div class="error">⚠️ 데이터를 불러올 수 없습니다.<br>새로고침 해주세요.</div>';});
 }
 init();
-</script>
+</script>/* ★ 부모 iframe 전체 스크롤용 — 높이 전달 */
+function notifyHeight(){
+  var h=document.body.scrollHeight;
+  window.parent.postMessage({type:'resize',height:h},'*');
+}
+window.addEventListener('load',function(){
+  notifyHeight();
+  setInterval(notifyHeight,500);
+});
+if(typeof MutationObserver!=='undefined'){
+  new MutationObserver(notifyHeight).observe(document.body,{childList:true,subtree:true,attributes:true});
+}
+if(window.parent!==window){
+  document.documentElement.style.overflow='hidden';
+  document.body.style.overflow='hidden';
+}
 </body>
 </html>
