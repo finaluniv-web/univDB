@@ -597,6 +597,22 @@ if(window.parent!==window){
   document.documentElement.style.overflow='hidden';
   document.body.style.overflow='hidden';
 }
-</script>
+</script>/* ── iframe 높이 부모에 전달 ── */
+function notifyHeight(){
+  var h=document.body.scrollHeight;
+  window.parent.postMessage({type:'resize',height:h},'*');
+}
+window.addEventListener('load',function(){
+  notifyHeight();
+  setInterval(notifyHeight,500);
+});
+if(typeof MutationObserver!=='undefined'){
+  new MutationObserver(notifyHeight).observe(document.body,{childList:true,subtree:true,attributes:true});
+}
+if(window.parent!==window){
+  document.documentElement.style.overflow='hidden';
+  document.body.style.overflow='hidden';
+}
+
 </body>
 </html>
